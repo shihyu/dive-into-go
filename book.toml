@@ -1,0 +1,10 @@
+[book]
+title = "深入 Go 語言之旅"
+authors = []
+language = "zh-TW"
+multilingual = false
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
