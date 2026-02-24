@@ -1,0 +1,521 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>恐慌與恢復  - panic/recover - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="恐慌與恢復---panicrecover"><a class="header" href="#恐慌與恢復---panicrecover">恐慌與恢復 - panic/recover</a></h1>
+<p>我們知道Go語言中許多錯誤會在編譯時暴露出來，直接編譯不通過，但對於空指針訪問元素，切片/數組越界訪問之類的運行時錯誤，只會在運行時引發 <code>panic</code> 異常暴露出來。這種由Go語言自動的觸發的 <code>panic</code> 異常屬於<strong>運行時panic(Run-time panics)</strong><sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>。當發生 <code>panic</code> 時候，Go會運行所有已經註冊的延遲函數，若延遲函數中未進行panic異常捕獲處理，那麼最終Go進程會終止，並打印堆棧信息。此外Go中還內置了 <code>panic</code> 函數，可以用於用戶手動觸發<code>panic</code>。</p>
+<p>Go語言中內置的 <code>recover</code> 函數可以用來捕獲 <code>panic</code>異常，但 <code>recover</code> 函數只能放在延遲函數調用中，才能起作用。我們從之前的章節《<strong><a href="defer.html">基礎篇-語言特性-defer函數</a></strong> 》瞭解到，多個延遲函數，會組成一個鏈表。Go在發生panic過程中，會依次遍歷該鏈表，並檢查鏈表中的延遲函數是否調用了 <code>recover</code> 函數調用，若調用了則 <code>panic</code> 異常會被捕獲而不會繼續向上拋出，否則會繼續向上拋出異常和執行延遲函數，直到該 <code>panic</code> 沒有被捕獲，進程異常終止，這個過程叫做<strong>panicking</strong>。我們需要知道的是<strong>即使panic被延遲函數鏈表中某個延遲函數捕獲處理了，但其他的延遲函數還是會繼續執行的，只是panic異常不在繼續拋出</strong>。</p>
+<p>接下來我們來將深入瞭解下panic和recover底層的實現機制。在開始之前，我們來看下下面的測試題。</p>
+<h2 id="測試題下面哪些panic異常將會捕獲"><a class="header" href="#測試題下面哪些panic異常將會捕獲">測試題：下面哪些panic異常將會捕獲？</a></h2>
+<p><strong>case 1:</strong></p>
+<pre><code class="language-go">func main() {
+    recover()
+    panic("it is panic") // not recover
+}
+</code></pre>
+<p><strong>case 2:</strong></p>
+<pre><code class="language-go">func main() {
+    defer func() {
+        recover()
+    }()
+
+    panic("it is panic") // recover
+}
+</code></pre>
+<p><strong>case 3:</strong></p>
+<pre><code class="language-go">func main() {
+	defer recover()
+	panic("it is panic") // not recover
+}
+</code></pre>
+<p><strong>case 4:</strong></p>
+<pre><code class="language-go">func main() {
+    defer func() {
+        defer recover()
+    }()
+
+    panic("it is panic") // recover
+}
+</code></pre>
+<p><strong>case 5:</strong></p>
+<pre><code class="language-go">func main() {
+	defer func() {
+		defer func() {
+			recover()
+		}()
+	}()
+
+	panic("it is panic") // not recover
+}
+</code></pre>
+<p><strong>case 6:</strong></p>
+<pre><code class="language-go">func main() {
+	defer doRecover()
+	panic("it is panic") // recover
+}
+
+func doRecover() {
+	recover()
+	fmt.Println("hello")
+}
+</code></pre>
+<p><strong>case 7:</strong></p>
+<pre><code class="language-go">func main() {
+	defer doRecover()
+	panic("it is panic") // recover
+}
+
+func doRecover() {
+	defer recover()
+}
+</code></pre>
+<p>簡單說明下上面幾個案例運行結果：</p>
+<ul>
+<li><code>case 1</code>中recover函數調用不是在defer延遲函數裏面，肯定不會捕獲panic異常。</li>
+<li><code>case 2</code>中是panic異常捕獲的標準操作，是可以捕獲panic異常的，<code>case 6</code>跟<code>case 2</code>是一樣的，只不過一個是匿名延遲函數，一個是具名延遲函數，同樣可以捕獲panic異常。</li>
+<li><code>case 3</code>中recover函數作爲延遲函數，沒有在其他延遲函數中調用，它也是不起作用的。</li>
+<li><code>case 4</code>中recover函數被一個延遲函數調用，且recover函數本身作爲一個延遲函數，這個情況下也是可以正常捕獲panic異常的，<code>case 7</code>跟<code>case 4</code>是一樣的，只不過一個是匿名延遲函數，一個是具名延遲函數，同樣可以捕獲panic異常。</li>
+<li><code>case 5</code>中儘管recover函數被延遲函數調用，但它卻無法捕獲panic異常。</li>
+</ul>
+<p>從上面案例中可以看出來，使用recover函數進行panic異常捕獲，也要使用正確才能起作用。下面會分析源碼，探討panic-recover實現機制，也能更好幫助你理解爲什麼<code>case 2</code>,<code>case 4</code>可以起作用，而<code>case 3</code>和<code>case 5</code>爲啥沒有起作用。</p>
+<h2 id="源碼分析"><a class="header" href="#源碼分析">源碼分析</a></h2>
+<p>我們先分析<code>case 2</code>案例，我們可以通過<code>go tool compile -N -l -S case2.go</code>獲取<a href="https://go.godbolt.org/z/713T1TvoG">彙編代碼</a>，來查看panic和recover在底層真正的實現：</p>
+<pre><code class="language-shell">main_pc0:
+	TEXT    "".main(SB), ABIInternal, $104-0
+	MOVQ    (TLS), CX
+	CMPQ    SP, 16(CX)
+	JLS     main_pc113
+	SUBQ    $104, SP
+	MOVQ    BP, 96(SP)
+	LEAQ    96(SP), BP
+	MOVL    $0, ""..autotmp_1+16(SP)
+	LEAQ    "".main.func1·f(SB), AX
+	MOVQ    AX, ""..autotmp_1+40(SP)
+	LEAQ    ""..autotmp_1+16(SP), AX
+	MOVQ    AX, (SP)
+	CALL    runtime.deferprocStack(SB)
+	TESTL   AX, AX
+	JNE     main_pc97
+	JMP     main_pc69
+main_pc69:
+	LEAQ    type.string(SB), AX
+	MOVQ    AX, (SP)
+	LEAQ    ""..stmp_0(SB), AX
+	MOVQ    AX, 8(SP)
+	CALL    runtime.gopanic(SB)
+main_pc97:
+	XCHGL   AX, AX
+	CALL    runtime.deferreturn(SB)
+	MOVQ    96(SP), BP
+	ADDQ    $104, SP
+	RET
+main_pc113:
+	NOP
+	CALL    runtime.morestack_noctxt(SB)
+	JMP     main_pc0
+main_func1_pc0:
+	TEXT    "".main.func1(SB), ABIInternal, $32-0
+	MOVQ    (TLS), CX
+	CMPQ    SP, 16(CX)
+	JLS     main_func1_pc53
+	SUBQ    $32, SP
+	MOVQ    BP, 24(SP)
+	LEAQ    24(SP), BP
+	LEAQ    ""..fp+40(SP), AX
+	MOVQ    AX, (SP)
+	CALL    runtime.gorecover(SB)
+	MOVQ    24(SP), BP
+	ADDQ    $32, SP
+	RET
+main_func1_pc53:
+	NOP
+	CALL    runtime.morestack_noctxt(SB)
+	JMP     main_func1_pc0
+</code></pre>
+<p>從上面彙編代碼中，可以看出 <code>panic</code> 函數底層實現 <code>runtime.gopanic</code>，<code>recover</code> 函數底層實現是 <code>runtime.gorecover</code>。</p>
+<p>panic函數底層實現的 <code>runtime.gopanic</code> 源碼如下：</p>
+<pre><code class="language-go">func gopanic(e interface{}) {
+	gp := getg()
+	
+	... // 一些判斷當前g是否允許在用戶棧，是否正在內存分配的代碼，略
+	
+	var p _panic // panic底層數據結構是_panic
+	p.arg = e // e是panic函數的參數，對應case2中的: it is panic
+	p.link = gp._panic
+	gp._panic = (*_panic)(noescape(unsafe.Pointer(&amp;p))) // 將當前panic掛到g上面
+
+	atomic.Xadd(&amp;runningPanicDefers, 1) // 記錄正在執行panic的goroutine數量，防止main groutine返回時候，
+	// 其他goroutine的panic棧信息未打印出來。@see https://github.com/golang/go/blob/go1.14.13/src/runtime/proc.go#L208-L220
+
+	
+	// 對於open-coded defer實現的延遲函數，需要掃描FUNCDATA_OpenCodedDeferInfo信息，
+	// 獲取延遲函數的sp/pc信息，並創建_defer結構，將其插入gp._defer鏈表中
+	// 這是也是在defer函數章節中，提到的爲啥open-coded defer提升了延遲函數的性能，而panic性能卻降低的原因
+	addOneOpenDeferFrame(gp, getcallerpc(), unsafe.Pointer(getcallersp()))
+
+	for { // 開始遍歷defer鏈表
+		d := gp._defer
+		if d == nil {
+			break
+		}
+
+	
+		// 當延遲函數裏面再次拋出panic或者調用runtime.Goexit時候，
+		// 會再次進入同一個延遲函數，此時d.started已經設置爲true狀態
+		if d.started {
+			if d._panic != nil { // 標記上一個_panic狀態爲aborted
+				d._panic.aborted = true
+			}
+			d._panic = nil
+			if !d.openDefer {
+				// 對於非open-coded defer函數，我們需要將_defer從gp._defer鏈表中溢出去，防止繼續重複執行
+				d.fn = nil
+				gp._defer = d.link
+				freedefer(d)
+				continue
+			}
+		}
+
+	
+		// 標記當前defer開始執行，這樣當g棧增長時候或者垃圾回收時候，可以更新defer的參數棧幀
+		d.started = true
+
+		// 記錄當前的_panic信息到_defer結構中，這樣當該defer函數再次發生panic時候，可以標記d._panic爲aborted狀態
+		d._panic = (*_panic)(noescape(unsafe.Pointer(&amp;p)))
+
+		done := true
+		if d.openDefer { // 如果該延遲函數是open-coded defer函數
+			done = runOpenDeferFrame(gp, d) // 運行open-coded defer函數，如果當前棧下面沒有其他延遲函數，則返回true
+			if done &amp;&amp; !d._panic.recovered { // 如果當前棧下面沒有其他open-coded defer函數了，且panic也未recover，
+			// 那麼繼續當前的open-coded defer函數的sp作爲基址，繼續掃描funcdata，獲取open-coded defer函數。
+			// 之所以這麼做是因爲open-coded defer裏面也存在defer函數的情況，例如case4
+				addOneOpenDeferFrame(gp, 0, nil)
+			}
+		} else {// 非open-coded defer實現的defer函數
+
+			// getargp返回其caller的保存callee參數的地址。
+			// 之前介紹過了Go語言中函數調用約定，callee的參數存儲，是由caller的棧空間提供。
+			p.argp = unsafe.Pointer(getargp(0)) // 這裏面p.argp保存的gopanic函數作爲caller時候，保存callee參數的地址。
+			// 之所以要_panic.argp保存gopanic的callee參數地址，
+			// 這是因爲調用gorecover會通過此檢查其caller的caller是不是gopanic。
+			// 這也是case5等不能捕獲panic異常的原因。
+
+			// 調用defer函數
+			reflectcall(nil, unsafe.Pointer(d.fn), deferArgs(d), uint32(d.siz), uint32(d.siz))
+		}
+		p.argp = nil
+
+		// reflectcall did not panic. Remove d.
+		if gp._defer != d {
+			throw("bad defer entry in panic")
+		}
+		d._panic = nil
+
+		pc := d.pc
+		sp := unsafe.Pointer(d.sp)
+		if done { // 從gp._defer鏈表清除掉當前defer函數
+			d.fn = nil
+			gp._defer = d.link
+			freedefer(d)
+		}
+		if p.recovered {
+			gp._panic = p.link
+			if gp._panic != nil &amp;&amp; gp._panic.goexit &amp;&amp; gp._panic.aborted {
+				// A normal recover would bypass/abort the Goexit.  Instead,
+				// we return to the processing loop of the Goexit.
+				gp.sigcode0 = uintptr(gp._panic.sp)
+				gp.sigcode1 = uintptr(gp._panic.pc)
+				mcall(recovery)
+				throw("bypassed recovery failed") // mcall should not return
+			}
+			atomic.Xadd(&amp;runningPanicDefers, -1)
+
+			if done { // panic已經被recover處理掉了，那麼移除掉上面通過addOneOpenDeferFrame添加到gp._defer中的open-coded defer函數。
+			// 因爲這些open-coded defer是通過inline方式執行的，從gp._defer鏈表中移除掉，不影響它們繼續的執行
+				d := gp._defer
+				var prev *_defer
+				for d != nil {
+					if d.openDefer {
+						if d.started {
+							break
+						}
+						if prev == nil {
+							gp._defer = d.link
+						} else {
+							prev.link = d.link
+						}
+						newd := d.link
+						freedefer(d)
+						d = newd
+					} else {
+						prev = d
+						d = d.link
+					}
+				}
+			}
+
+			gp._panic = p.link // 無用代碼，上面已經操作過了
+			// Aborted panics are marked but remain on the g.panic list.
+			// Remove them from the list.
+			for gp._panic != nil &amp;&amp; gp._panic.aborted {
+				gp._panic = gp._panic.link
+			}
+			if gp._panic == nil { // must be done with signal
+				gp.sig = 0
+			}
+			// Pass information about recovering frame to recovery.
+			gp.sigcode0 = uintptr(sp)
+			gp.sigcode1 = pc
+			mcall(recovery)
+			throw("recovery failed") // mcall should not return
+		}
+	}
+
+	preprintpanics(gp._panic)
+
+	fatalpanic(gp._panic) // should not return
+	*(*int)(nil) = 0      // not reached
+}
+</code></pre>
+<p>對於基於open-coded defer方式實現的延遲函數中處理panic recover邏輯，比如addOneOpenDeferFrame，runOpenDeferFrame等函數，這裏不再深究。這裏主要分析通過鏈表實現的延遲函數中處理panic recover邏輯。</p>
+<p>接下來我們看下recover函數底層實現<code>runtime.gorecover</code>源碼</p>
+<pre><code class="language-go">func gorecover(argp uintptr) interface{} {
+	gp := getg()
+	p := gp._panic
+	if p != nil &amp;&amp; !p.goexit &amp;&amp; !p.recovered &amp;&amp; argp == uintptr(p.argp) {
+		p.recovered = true
+		return p.arg
+	}
+	return nil
+}
+</code></pre>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p><a href="https://go.dev/ref/spec#Run_time_panics">Go官方語法指南：運行時恐慌</a> <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../feature/select.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../concurrency/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../feature/select.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../concurrency/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

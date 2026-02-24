@@ -1,0 +1,382 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>指針 - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="指針"><a class="header" href="#指針">指針</a></h1>
+<p>Golang支持指針，但是不能像C語言中那樣進行算術運算。<strong>對於任意類型T，其對應的的指針類型是*T，類型T稱爲指針類型*T的基類型</strong>。</p>
+<h2 id="引用與解引用"><a class="header" href="#引用與解引用">引用與解引用</a></h2>
+<p>一個指針類型*T變量B存儲的是類型T變量A的內存地址，我們稱該指針類型變量B<strong>引用(reference)<strong>了A。從指針類型變量B獲取（或者稱爲訪問）A變量的值的過程，叫</strong>解引用</strong>。解引用是通過解引用操作符*操作的。</p>
+<pre><code class="language-go">func main() {
+	var A int = 100
+	var B *int = &amp;A
+
+	fmt.Println(A == *B)
+}
+</code></pre>
+<h2 id="轉換和可比較性"><a class="header" href="#轉換和可比較性">轉換和可比較性</a></h2>
+<p>對於指針類型變量能不能夠比較和顯示轉換需要滿足以下規則：</p>
+<ul>
+<li>指針類型*T1和*T2相應的基類型T1和T2的底層類型必須一致。</li>
+</ul>
+<pre><code class="language-go">type MyInt int
+type PInt *int
+type PMyInt *MyInt
+
+func main() {
+	p1 := new(int)
+	var p2 PInt = p1 // p2底層類型是*int
+	p3 := new(MyInt)
+	var p4 PMyInt = p3 // p4底層類型是*MyInt
+	fmt.Println(p1, p2, p3, p4)
+}
+</code></pre>
+<h2 id="uintptr"><a class="header" href="#uintptr">uintptr</a></h2>
+<p>uintptr是一個足夠大的整數類型，能夠存放任何指針。不同C語言，Go語言中普通類型指針不能進行算術運算，我們可以將普通類型指針轉換成uintptr然後進行運算，但普通類型指針不能直接轉換成uintptr，必須先轉換成unsafe.Pointer類型之後，再轉換成uintptr。</p>
+<pre><code class="language-go">// uintptr is an integer type that is large enough to hold the bit pattern of
+// any pointer.
+type uintptr uintptr
+</code></pre>
+<h2 id="unsafepointer"><a class="header" href="#unsafepointer">unsafe.Pointer</a></h2>
+<p><code>unsafe</code>標準庫包提供了<code>unsafe.Pointer</code>類型，<code>unsafe.Pointer</code>類型稱爲非安全指針類型。</p>
+<pre><code class="language-go">type ArbitraryType int
+type Pointer *ArbitraryType
+</code></pre>
+<p><code>unsafe</code>標準庫包中也提供了三個函數：</p>
+<pre><code class="language-go">func Alignof(variable ArbitraryType) uintptr // 用來獲取變量variable的對齊保證
+func Offsetof(selector ArbitraryType) uintptr // 用來獲取結構體值中的某個字段的地址相對於此結構體值地址的偏移
+func Sizeof(variable ArbitraryType) uintptr // 用來獲取變量variable變量的大小尺寸
+</code></pre>
+<p><strong>任何指針類型都可以轉換成<code>unsafe.Pointer</code>類型</strong>，即<code>unsafe.Pointer</code>可以指向任何類型（arbitrary type），但是該類型值是不能夠解引用(dereferenced)的。<code>unsafe.Pointer</code>類型的零值是nil。反過來，<strong><code>unsafe.Pointer</code>也可以轉換成任何指針類型</strong>。</p>
+<p><code>unsafe.Pointer</code>類型變量可以顯示轉換成內置的<code>uintptr</code>類型變量，<code>uintptr</code>變量是整數，可以進行算術運算，也可以反向轉換成<code>unsafe.Pointer</code>。</p>
+<blockquote>
+<p>安全類型指針(普通類型指針) &lt;----&gt; unsafe.Pointer &lt;-----&gt; uintptr</p>
+</blockquote>
+<h3 id="如何正確地使用非類型安全指針"><a class="header" href="#如何正確地使用非類型安全指針">如何正確地使用非類型安全指針？</a></h3>
+<p><code>unsafe</code>包中列出<a href="https://golang.google.cn/pkg/unsafe/#Pointer">6種正確使用<code>unsafe.Pointer</code>的模式</a>。</p>
+<blockquote>
+<p>Code not using these patterns is likely to be invalid today or to become invalid in the future 在代碼中不使用這些模式可能現在無效，或者將來也會變成無效的。</p>
+</blockquote>
+<h4 id="通過非安全類型指針將t1轉換成t2"><a class="header" href="#通過非安全類型指針將t1轉換成t2">通過非安全類型指針，將<em>T1轉換成</em>T2</a></h4>
+<pre><code class="language-go">func Float64bits(f float64) uint64 {
+	return *(*uint64)(unsafe.Pointer(&amp;f))
+}
+</code></pre>
+<p>此時<code>unsafe.Pointer</code>充當橋樑，注意T2類型的尺寸不應該大於T1，否則會出現溢出異常</p>
+<h4 id="將非安全類型指針轉換成uintptr類型"><a class="header" href="#將非安全類型指針轉換成uintptr類型">將非安全類型指針轉換成<code>uintptr</code>類型</a></h4>
+<pre><code class="language-go">type MyInt int
+
+func main() {
+	a := 100
+	fmt.Printf("%p\n", &amp;a)
+	fmt.Printf("%x\n", uintptr(unsafe.Pointer(&amp;a)))
+}
+</code></pre>
+<h4 id="將非安全類型指針轉換成uintptr類型並進行算術運算"><a class="header" href="#將非安全類型指針轉換成uintptr類型並進行算術運算">將非安全類型指針轉換成<code>uintptr</code>類型，並進行算術運算</a></h4>
+<p>這種模式常用來訪問結構體字段或者數組的地址。</p>
+<pre><code class="language-go">type MyType struct {
+	f1 uint8
+	f2 int
+	f3 uint64
+}
+
+func main() {
+	s := MyType{f1: 10, f2: 20, f3: 30}
+	f2UintPtr := uintptr(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + unsafe.Offsetof(s.f2)))
+	fmt.Printf("%p\n", &amp;s)
+	fmt.Printf("%x\n", f2UintPtr) // f2UintPtr = s地址 + 8
+
+	arr := [3]int{}
+	fmt.Printf("%p\n", &amp;arr)
+	for i := 0; i &lt; 3; i++ {
+		addr := uintptr(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;arr[0])) + uintptr(i)*unsafe.Sizeof(arr[0])))
+		fmt.Printf("%x\n", addr)
+	}
+}
+</code></pre>
+<p>通過指針移動到變量內存地址的末尾是無效的：</p>
+<pre><code class="language-go">// INVALID: end points outside allocated space.
+var s thing
+end = unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + unsafe.Sizeof(s))
+
+// INVALID: end points outside allocated space.
+b := make([]byte, n)
+end = unsafe.Pointer(uintptr(unsafe.Pointer(&amp;b[0])) + uintptr(n))
+</code></pre>
+<pre><code class="language-eval_rst">.. warning:: 當將uintptr轉換回unsafe.Pointer時，其不能賦值給一個變量進行中轉。
+</code></pre>
+<p>我們來看看下面這個例子：</p>
+<pre><code class="language-go">type MyType struct {
+	f1 uint8
+	f2 int
+	f3 uint64
+}
+
+func main() {
+	// 方式1
+	s := MyType{f1: 10, f2: 20, f3: 30}
+	ptr := uintptr(unsafe.Pointer(&amp;s)) + unsafe.Offsetof(s.f2)
+	f2Ptr := (*int)(unsafe.Pointer(ptr))
+	fmt.Println(*f2Ptr)
+
+	// 方式2
+	f2Ptr2 := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + unsafe.Offsetof(s.f2)))
+	fmt.Println(*f2Ptr2)
+}
+</code></pre>
+<p>上面代碼中方式1是不安全的，儘管大多數情況結果是符合我們期望的，但是由於將uintptr賦值給ptr時，變量s已不再被引用，這時候若恰好進行GC，變量s會被回收處理。這會造成此後的操作都是非法訪問內存地址。所以對於uintptr轉換成unsafe.Pointer的場景，我們應該採用方式2將其寫在一行裏面。</p>
+<h4 id="將非類型安全指針值轉換爲uintptr值然後傳遞給syscallsyscall函數"><a class="header" href="#將非類型安全指針值轉換爲uintptr值然後傳遞給syscallsyscall函數">將非類型安全指針值轉換爲uintptr值，然後傳遞給syscall.Syscall函數</a></h4>
+<p>如果unsafe.Pointer參數必須轉換爲uintptr才能作爲參數使用，這個轉換必須出現在調用表達式中：</p>
+<pre><code class="language-go">syscall.Syscall(SYS_READ, uintptr(fd), uintptr(unsafe.Pointer(p)), uintptr(n))
+</code></pre>
+<p>將unsafe.Pointer轉換成uintptr後傳參時，無法保證執行函數時其執行的內存未回收。只有將這個轉換放在函數調用表達時候，才能保證函數能夠安全的訪問該內存，這個是編譯器進行安全保障實現的。</p>
+<h4 id="將reflectvaluepointer或reflectvalueunsafeaddr方法的uintptr返回值轉換爲非類型安全指針"><a class="header" href="#將reflectvaluepointer或reflectvalueunsafeaddr方法的uintptr返回值轉換爲非類型安全指針">將reflect.Value.Pointer或reflect.Value.UnsafeAddr方法的uintptr返回值轉換爲非類型安全指針</a></h4>
+<p>reflect標準庫包中的Value類型的Pointer和UnsafeAddr方法都返回uintptr類型值，而不是unsafe.Pointer類型值，是<strong>爲了避免用戶在不引用unsafe包情況下就可以將這兩個方法的返回值轉換爲任何類型安全指針類型</strong>。</p>
+<p>調用reflect.Value.Pointer或reflect.Value.UnsafeAddr方法獲取uintptr，並轉換unsafe.Pointer必須放在一行表達式中：</p>
+<pre><code class="language-go">p := (*int)(unsafe.Pointer(reflect.ValueOf(new(int)).Pointer()))
+</code></pre>
+<p>下面這種形式是非法：</p>
+<pre><code class="language-go">// INVALID: uintptr cannot be stored in variable
+// before conversion back to Pointer.
+u := reflect.ValueOf(new(int)).Pointer()
+p := (*int)(unsafe.Pointer(u))
+</code></pre>
+<h4 id="將reflectsliceheader或reflectstringheader的data字段轉換成非安全類型或反之操作"><a class="header" href="#將reflectsliceheader或reflectstringheader的data字段轉換成非安全類型或反之操作">將reflect.SliceHeader或reflect.StringHeader的Data字段轉換成非安全類型，或反之操作</a></h4>
+<p>正確的轉換操作如下：</p>
+<pre><code class="language-go">var s string
+hdr := (*reflect.StringHeader)(unsafe.Pointer(&amp;s)) // 模式1
+hdr.Data = uintptr(unsafe.Pointer(p))              // 模式6
+hdr.Len = n
+</code></pre>
+<p>下面操作是存在bug的：</p>
+<pre><code class="language-go">var hdr reflect.StringHeader
+hdr.Data = uintptr(unsafe.Pointer(p))
+// 當執行下面代碼時候，hdr.Data指向的內存可以已經被回收了
+hdr.Len = n
+s := *(*string)(unsafe.Pointer(&amp;hdr))
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../type/empty_struct.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../type/map.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../type/empty_struct.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../type/map.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

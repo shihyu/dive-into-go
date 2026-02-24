@@ -1,0 +1,488 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>空結構體 - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="空結構體"><a class="header" href="#空結構體">空結構體</a></h1>
+<p>空結構體指的是沒有任何字段的結構體。</p>
+<h2 id="大小與內存地址"><a class="header" href="#大小與內存地址">大小與內存地址</a></h2>
+<p>空結構體佔用的內存空間大小爲零字節，並且它們的地址可能相等也可能不等。當發生內存逃逸時候，它們的地址是相等的，都指向了 <code>runtime.zerobase</code>。</p>
+<pre><code class="language-go">// empty_struct.go
+type Empty struct{}
+
+//go:linkname zerobase runtime.zerobase
+var zerobase uintptr // 使用go:linkname編譯指令，將zerobase變量指向runtime.zerobase
+
+func main() {
+	a := Empty{}
+	b := struct{}{}
+
+	fmt.Println(unsafe.Sizeof(a) == 0) // true
+	fmt.Println(unsafe.Sizeof(b) == 0) // true
+	fmt.Printf("%p\n", &amp;a)             // 0x590d00
+	fmt.Printf("%p\n", &amp;b)             // 0x590d00
+	fmt.Printf("%p\n", &amp;zerobase)      // 0x590d00
+
+	c := new(Empty)
+	d := new(Empty)
+	fmt.Sprint(c, d) // 目的是讓變量c和d發生逃逸
+	println(c) // 0x590d00
+	println(d) // 0x590d00
+	fmt.Println(c == d) // true
+
+	e := new(Empty)
+	f := new(Empty)
+	println(e)          // 0xc00008ef47
+	println(f)          // 0xc00008ef47
+	fmt.Println(e == f) // flase
+}
+</code></pre>
+<p>從上面代碼輸出可以看到 <code>a</code>, <code>b</code>, <code>zerobase</code> 這三個變量的地址都是一樣的，最終指向的都是全局變量<code>runtime.zerobase</code>(<strong><a href="https://github.com/golang/go/blob/go1.14.13/src/runtime/malloc.go#L827">runtime/malloc.go</a></strong>)。</p>
+<pre><code class="language-go">// base address for all 0-byte allocations
+var zerobase uintptr
+</code></pre>
+<p>我們可以通過下面方法再次來驗證一下 <code>runtime.zerobase</code> 變量的地址是不是也是<code>0x590d00</code>：</p>
+<pre><code class="language-shell">go build -o empty_struct empty_struct.go
+go tool nm ./empty_struct | grep 590d00
+# 或者
+objdump -t empty_struct | grep 590d00
+</code></pre>
+<p>執行上面命令輸出以下的內容：</p>
+<pre><code class="language-shell">590d00 D runtime.zerobase
+# 或者
+0000000000590d00 g     O .noptrbss	0000000000000008 runtime.zerobase
+</code></pre>
+<p>從上面輸出的內容可以看到 <code>runtime.zerobase</code> 的地址也是 <code>0x590d00</code>。</p>
+<p>接下來我們看看變量逃逸的情況：</p>
+<pre><code class="language-shell"> go run -gcflags="-m -l" empty_struct.go
+# command-line-arguments
+./empty_struct.go:15:2: moved to heap: a
+./empty_struct.go:16:2: moved to heap: b
+./empty_struct.go:18:13: ... argument does not escape
+./empty_struct.go:18:31: unsafe.Sizeof(a) == 0 escapes to heap
+./empty_struct.go:19:13: ... argument does not escape
+./empty_struct.go:19:31: unsafe.Sizeof(b) == 0 escapes to heap
+./empty_struct.go:20:12: ... argument does not escape
+./empty_struct.go:21:12: ... argument does not escape
+./empty_struct.go:22:12: ... argument does not escape
+./empty_struct.go:24:10: new(Empty) escapes to heap
+./empty_struct.go:25:10: new(Empty) escapes to heap
+./empty_struct.go:26:12: ... argument does not escape
+./empty_struct.go:29:13: ... argument does not escape
+./empty_struct.go:29:16: c == d escapes to heap
+./empty_struct.go:31:10: new(Empty) does not escape
+./empty_struct.go:32:10: new(Empty) does not escape
+./empty_struct.go:35:13: ... argument does not escape
+./empty_struct.go:35:16: e == f escapes to heap
+</code></pre>
+<p>可以看到變量 <code>c</code> 和 <code>d</code> 逃逸到堆上，它們打印出來的都是 <code>0x591d00</code>，且兩者進行相等比較時候返回 <code>true</code>。而變量 <code>e</code> 和 <code>f</code> 打印出來的都是<code>0xc00008ef47</code>，但兩者進行相等比較時候卻返回<code>false</code>。這因爲Go有意爲之的，當空結構體變量未發生逃逸時候，指向該變量的指針是不等的，當空結構體變量發生逃逸之後，指向該變量是相等的。這也就是 <strong><a href="https://go.dev/ref/spec">Go官方語法指南</a></strong> 所說的：</p>
+<blockquote>
+<p>Pointers to distinct zero-size variables may or may not be equal</p>
+</blockquote>
+<p><img src="../images/202201/go-compare-operators.png" alt="Go語言比較操作符比較規則" /></p>
+<blockquote>
+<p><strong>危險</strong>
+<strong>注意：</strong><br />
+不論逃逸還是未逃逸，我們都不應該對空結構體類型變量指向的內存地址是否一樣，做任何預期。</p>
+</blockquote>
+<h2 id="當一個結構體嵌入空結構體時佔用空間怎麼計算"><a class="header" href="#當一個結構體嵌入空結構體時佔用空間怎麼計算">當一個結構體嵌入空結構體時，佔用空間怎麼計算？</a></h2>
+<p>空結構體本身不佔用空間，但是作爲某結構體內嵌字段時候，有可能是佔用空間的。具體計算規則如下：</p>
+<ul>
+<li>當空結構體是該結構體唯一的字段時，該結構體是不佔用空間的，空結構體自然也不佔用空間</li>
+<li>當空結構體作爲第一個字段或者中間字段時候，是不佔用空間的</li>
+<li>當空結構體作爲最後一個字段時候，是佔用空間的，大小跟其前一個字段保持一致</li>
+</ul>
+<pre><code class="language-go">type s1 struct {
+	a struct{}
+}
+
+type s2 struct {
+	_ struct{}
+}
+
+type s3 struct {
+	a struct{}
+	b byte
+}
+
+type s4 struct {
+	a struct{}
+	b int64
+}
+
+type s5 struct {
+	a byte
+	b struct{}
+	c int64
+}
+
+type s6 struct {
+	a byte
+	b struct{}
+}
+
+type s7 struct {
+	a int64
+	b struct{}
+}
+
+type s8 struct {
+	a struct{}
+	b struct{}
+}
+
+func main() {
+	fmt.Println(unsafe.Sizeof(s1{})) // 0
+	fmt.Println(unsafe.Sizeof(s2{})) // 0
+	fmt.Println(unsafe.Sizeof(s3{})) // 1
+	fmt.Println(unsafe.Sizeof(s4{})) // 8
+	fmt.Println(unsafe.Sizeof(s5{})) // 16
+	fmt.Println(unsafe.Sizeof(s6{})) // 2
+	fmt.Println(unsafe.Sizeof(s7{})) // 16
+	fmt.Println(unsafe.Sizeof(s8{})) // 0
+}
+</code></pre>
+<p>當空結構體作爲數組、切片的元素時候：</p>
+<pre><code class="language-go">var a [10]int
+fmt.Println(unsafe.Sizeof(a)) // 80
+
+var b [10]struct{}
+fmt.Println(unsafe.Sizeof(b)) // 0
+
+var c = make([]struct{}, 10)
+fmt.Println(unsafe.Sizeof(c)) // 24，即slice header的大小
+</code></pre>
+<h2 id="用途"><a class="header" href="#用途">用途</a></h2>
+<p>由於空結構體佔用的空間大小爲零，我們可以利用這個特性，完成一些功能，卻不需要佔用額外空間。</p>
+<h3 id="阻止unkeyed方式初始化結構體"><a class="header" href="#阻止unkeyed方式初始化結構體">阻止<code>unkeyed</code>方式初始化結構體</a></h3>
+<pre><code class="language-go">type MustKeydStruct struct {
+	Name string
+	Age  int
+	_    struct{}
+}
+
+func main() {
+	persion := MustKeydStruct{Name: "hello", Age: 10}
+	fmt.Println(persion)
+	persion2 := MustKeydStruct{"hello", 10} //編譯失敗，提示： too few values in MustKeydStruct{...}
+	fmt.Println(persion2)
+}
+</code></pre>
+<h3 id="實現集合數據結構"><a class="header" href="#實現集合數據結構">實現集合數據結構</a></h3>
+<p>集合數據結構我們可以使用map來實現：只關心key，不必關心value，我們就可以值設置爲空結構體類型變量（或者底層類型是空結構體的變量）。</p>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+)
+
+type Set struct {
+	items map[interface{}]emptyItem
+}
+
+type emptyItem struct{}
+
+var itemExists = emptyItem{}
+
+func NewSet() *Set {
+	set := &amp;Set{items: make(map[interface{}]emptyItem)}
+	return set
+}
+
+// 添加元素到集合
+func (set *Set) Add(item interface{}) {
+	set.items[item] = itemExists
+}
+
+// 從集合中刪除元素
+func (set *Set) Remove(item interface{}) {
+	delete(set.items, item)
+
+}
+
+// 判斷元素是否存在集合中
+func (set *Set) Contains(item interface{}) bool {
+	_, contains := set.items[item]
+	return contains
+}
+
+// 返回集合大小
+func (set *Set) Size() int {
+	return len(set.items)
+}
+
+func main() {
+	set := NewSet()
+	set.Add("hello")
+	set.Add("world")
+	fmt.Println(set.Contains("hello"))
+	fmt.Println(set.Contains("Hello"))
+	fmt.Println(set.Size())
+}
+</code></pre>
+<h3 id="作爲通道的信號傳輸"><a class="header" href="#作爲通道的信號傳輸">作爲通道的信號傳輸</a></h3>
+<p>使用通道時候，有時候我們只關心是否有數據從通道內傳輸出來，而不關心數據內容，這時候通道數據相當於一個信號，比如我們實現退出時候。下面例子是基於通道實現的信號量。</p>
+<pre><code class="language-go">// empty struct
+var empty = struct{}{}
+
+// Semaphore is empty type chan
+type Semaphore chan struct{}
+
+// P used to acquire n resources
+func (s Semaphore) P(n int) {
+	for i := 0; i &lt; n; i++ {
+		s &lt;- empty
+	}
+}
+
+// V used to release n resouces
+func (s Semaphore) V(n int) {
+	for i := 0; i &lt; n; i++ {
+		&lt;-s
+	}
+}
+
+// Lock used to lock resource
+func (s Semaphore) Lock() {
+	s.P(1)
+}
+
+// Unlock used to unlock resource
+func (s Semaphore) Unlock() {
+	s.V(1)
+}
+
+// NewSemaphore return semaphore
+func NewSemaphore(N int) Semaphore {
+	return make(Semaphore, N)
+}
+</code></pre>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<ul>
+<li><a href="https://dave.cheney.net/2014/03/25/the-empty-struct">The empty struct</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../type/nil.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../type/pointer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../type/nil.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../type/pointer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

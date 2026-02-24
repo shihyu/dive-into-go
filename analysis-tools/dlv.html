@@ -1,0 +1,442 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Delve - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="delve"><a class="header" href="#delve">Delve</a></h1>
+<p><strong>Delve</strong><sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup> 是使用Go語言實現的，專門用來調試Go程序的工具。它跟 <strong><a href="gdb.html">GDB</a></strong> 工具類似，相比 <strong><a href="gdb.html">GDB</a></strong>，它簡單易用，能夠更好的理解和處理Go語言的數據結構和語言特性，比如它支持打印 <code>goroutine</code> 以及 <code>defer</code> 函數等Go特有的語法特性。<strong>Delve</strong> 簡稱 <code>dlv</code>，後文將以 <code>dlv</code> 代稱 <strong>Delve</strong>.</p>
+<h2 id="安裝"><a class="header" href="#安裝">安裝</a></h2>
+<pre><code class="language-bash"># 安裝最新版本
+go get -u github.com/go-delve/delve/cmd/dlv
+# 查看版本
+dlv version
+</code></pre>
+<h2 id="使用"><a class="header" href="#使用">使用</a></h2>
+<h3 id="開始調試"><a class="header" href="#開始調試">開始調試</a></h3>
+<p><code>dlv</code> 使用 <code>debug</code> 命令進入調試界面：</p>
+<pre><code class="language-bash">dlv debug main.go
+</code></pre>
+<p>如果當前目錄是 <code>main</code> 包所在目錄時候，可以不用指定 <code>main.go</code> 文件這個參數的。假定項目結構如下：</p>
+<pre><code class="language-bash">.
+├── github.com/me/foo
+├── cmd
+│   └── foo
+│       └── main.go
+├── pkg
+│   └── baz
+│       ├── bar.go
+│       └── bar_test.go
+</code></pre>
+<p>如果當前已在 <code>cmd/foo</code> 目錄下，我們可以直接執行 <code>dlv debug</code> 命令開始調試。在任何目錄下我們可以使用 <code>dlv debug github.com/me/foo/cmd/foo</code> 開始調試。</p>
+<p>如果已構建成二進制可執行文件，我們可以使用 <code>dlv exec</code> 命令開始調試：</p>
+<pre><code class="language-bash">dlv exec /youpath/go_binary_file
+</code></pre>
+<p><strong>對於需要命令行參數才能啓動的程序，我們可以通過<code>--</code>來傳遞命令行參數</strong>，比如如下:</p>
+<pre><code class="language-bash">dlv debug github.com/me/foo/cmd/foo -- -arg1 value
+dlv exec /mypath/binary -- --config=config.toml
+</code></pre>
+<p>對於已經運行的程序，可以使用 <code>attach</code> 命令，進行跟蹤調試指定 <code>pid</code> 的Go應用：</p>
+<pre><code class="language-bash">dlv attach pid
+</code></pre>
+<p>除了上面調試 <code>main</code> 包外，<code>dlv</code> 通過 <code>test</code> 子命令還支持調試 <code>test</code> 文件：</p>
+<pre><code class="language-bash">dlv test github.com/me/foo/pkg/baz
+</code></pre>
+<p>接下來我們可以使用 <code>help</code> 命令查看 <code>dlv</code> 支持的命令有哪些：</p>
+<pre><code class="language-bash">(dlv) help
+The following commands are available:
+
+Running the program:
+    call ------------------------ Resumes process, injecting a function call (EXPERIMENTAL!!!)
+    continue (alias: c) --------- Run until breakpoint or program termination.
+    next (alias: n) ------------- Step over to next source line.
+    rebuild --------------------- Rebuild the target executable and restarts it. It does not work if the executable was not built by delve.
+    restart (alias: r) ---------- Restart process.
+    step (alias: s) ------------- Single step through program.
+    step-instruction (alias: si)  Single step a single cpu instruction.
+    stepout (alias: so) --------- Step out of the current function.
+
+Manipulating breakpoints:
+    break (alias: b) ------- Sets a breakpoint.
+    breakpoints (alias: bp)  Print out info for active breakpoints.
+    clear ------------------ Deletes breakpoint.
+    clearall --------------- Deletes multiple breakpoints.
+    condition (alias: cond)  Set breakpoint condition.
+    on --------------------- Executes a command when a breakpoint is hit.
+    trace (alias: t) ------- Set tracepoint.
+
+Viewing program variables and memory:
+    args ----------------- Print function arguments.
+    display -------------- Print value of an expression every time the program stops.
+    examinemem (alias: x)  Examine memory:
+    locals --------------- Print local variables.
+    print (alias: p) ----- Evaluate an expression.
+    regs ----------------- Print contents of CPU registers.
+    set ------------------ Changes the value of a variable.
+    vars ----------------- Print package variables.
+    whatis --------------- Prints type of an expression.
+
+Listing and switching between threads and goroutines:
+    goroutine (alias: gr) -- Shows or changes current goroutine
+    goroutines (alias: grs)  List program goroutines.
+    thread (alias: tr) ----- Switch to the specified thread.
+    threads ---------------- Print out info for every traced thread.
+
+Viewing the call stack and selecting frames:
+    deferred --------- Executes command in the context of a deferred call.
+    down ------------- Move the current frame down.
+    frame ------------ Set the current frame, or execute command on a different frame.
+    stack (alias: bt)  Print stack trace.
+    up --------------- Move the current frame up.
+
+Other commands:
+    config --------------------- Changes configuration parameters.
+    disassemble (alias: disass)  Disassembler.
+    edit (alias: ed) ----------- Open where you are in $DELVE_EDITOR or $EDITOR
+    exit (alias: quit | q) ----- Exit the debugger.
+    funcs ---------------------- Print list of functions.
+    help (alias: h) ------------ Prints the help message.
+    libraries ------------------ List loaded dynamic libraries
+    list (alias: ls | l) ------- Show source code.
+    source --------------------- Executes a file containing a list of delve commands
+    sources -------------------- Print list of source files.
+    types ---------------------- Print list of types
+
+Type help followed by a command for full documentation.
+</code></pre>
+<p>接下來我們將以下面代碼作爲示例演示如何dlv進行調試。</p>
+<pre><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("go")
+}
+</code></pre>
+<h3 id="設置斷點"><a class="header" href="#設置斷點">設置斷點</a></h3>
+<p>當我們使用 <code>dlv debug main.go</code> 命令進行 <code>dlv</code> 調試之後，我們可以設置斷點。</p>
+<pre><code class="language-bash">(dlv) b main.main # 在main函數處設置斷點
+Breakpoint 1 set at 0x4adf8f for main.main() ./main.go:5
+</code></pre>
+<h3 id="繼續執行"><a class="header" href="#繼續執行">繼續執行</a></h3>
+<p>設置斷點之後，我們可以通過 <code>continue</code> 命令，可以簡寫成 <code>c</code> ，繼續執行到我們設置的斷點處。</p>
+<pre><code class="language-bash">(dlv) c
+&gt; main.main() ./main.go:5 (hits goroutine(1):1 total:1) (PC: 0x4adf8f)
+     1:	package main
+     2:
+     3:	import "fmt"
+     4:
+=&gt;   5:	func main() {
+     6:		fmt.Println("go")
+     7:	}
+</code></pre>
+<p>注意不同於 <strong><a href="gdb.html">GDB</a></strong> 需要執行 <code>run</code> 命令啓動應用之後，才能執行 <code>continue</code> 命令。而 <code>dlv</code> 在進入調試界面之後，已經指向程序的入口地址處，可以直接執行 <code>continue</code> 命令</p>
+<h3 id="執行下一條指令"><a class="header" href="#執行下一條指令">執行下一條指令</a></h3>
+<p>我們可以通過next命令，可以簡寫成<code>n</code>，來執行下一行源碼。同 <strong><a href="gdb.html">GDB</a></strong> 一樣，<code>next</code> 命令是 <code>Step over</code> 操作，遇到函數時不會進入函數內部一行行代碼執行，而是直接執行函數，然後跳過到函數下面的一行代碼。</p>
+<pre><code class="language-bash">(dlv) n
+go
+&gt; main.main() ./main.go:7 (PC: 0x4adfff)
+     2:
+     3:	import "fmt"
+     4:
+     5:	func main() {
+     6:		fmt.Println("go")
+=&gt;   7:	}
+</code></pre>
+<h3 id="打印棧信息"><a class="header" href="#打印棧信息">打印棧信息</a></h3>
+<p>通過 <code>stack</code> 命令，我們可以查看函數棧信息：</p>
+<pre><code class="language-bash">(dlv) stack
+0  0x00000000004adfff in main.main
+   at ./main.go:7
+1  0x0000000000436be8 in runtime.main
+   at /usr/lib/go/src/runtime/proc.go:203
+2  0x0000000000464621 in runtime.goexit
+   at /usr/lib/go/src/runtime/asm_amd64.s:1373
+</code></pre>
+<h3 id="打印gorountine信息"><a class="header" href="#打印gorountine信息">打印gorountine信息</a></h3>
+<p>通過<code>goroutines</code>命令，可以簡寫成<code>grs</code>，我們可以查看所有 <code>goroutine</code>：</p>
+<pre><code class="language-bash">(dlv) goroutines
+* Goroutine 1 - User: ./main.go:7 main.main (0x4adfff) (thread 14358)
+  Goroutine 2 - User: /usr/lib/go/src/runtime/proc.go:305 runtime.gopark (0x436f9b)
+  Goroutine 3 - User: /usr/lib/go/src/runtime/proc.go:305 runtime.gopark (0x436f9b)
+  Goroutine 4 - User: /usr/lib/go/src/runtime/proc.go:305 runtime.gopark (0x436f9b)
+  Goroutine 5 - User: /usr/lib/go/src/runtime/mfinal.go:161 runtime.runfinq (0x418f80)
+[5 goroutines]
+</code></pre>
+<p><code>goroutine</code> 命令，可以簡寫成 <code>gr</code>，用來顯示當前 <code>goroutine</code> 信息：</p>
+<pre><code class="language-bash">(dlv) goroutine
+Thread 14358 at ./main.go:7
+Goroutine 1:
+	Runtime: ./main.go:7 main.main (0x4adfff)
+	User: ./main.go:7 main.main (0x4adfff)
+	Go: /usr/lib/go/src/runtime/asm_amd64.s:220 runtime.rt0_go (0x462594)
+	Start: /usr/lib/go/src/runtime/proc.go:113 runtime.main (0x436a20)
+</code></pre>
+<h3 id="查看彙編代碼"><a class="header" href="#查看彙編代碼">查看彙編代碼</a></h3>
+<p>通過 <code>disassemble</code> 命令，可以簡寫成 <code>disass</code> ，我們可以查看彙編代碼：</p>
+<pre><code class="language-bash">(dlv) disass
+TEXT main.main(SB) /tmp/dlv/main.go
+	main.go:5		0x4adf80	64488b0c25f8ffffff	mov rcx, qword ptr fs:[0xfffffff8]
+	main.go:5		0x4adf89	483b6110		cmp rsp, qword ptr [rcx+0x10]
+	main.go:5		0x4adf8d	767a			jbe 0x4ae009
+	main.go:5		0x4adf8f*	4883ec68		sub rsp, 0x68
+	main.go:5		0x4adf93	48896c2460		mov qword ptr [rsp+0x60], rbp
+	main.go:5		0x4adf98	488d6c2460		lea rbp, ptr [rsp+0x60]
+	main.go:6		0x4adf9d	0f57c0			xorps xmm0, xmm0
+	main.go:6		0x4adfa0	0f11442438		movups xmmword ptr [rsp+0x38], xmm0
+	main.go:6		0x4adfa5	488d442438		lea rax, ptr [rsp+0x38]
+	main.go:6		0x4adfaa	4889442430		mov qword ptr [rsp+0x30], rax
+	main.go:6		0x4adfaf	8400			test byte ptr [rax], al
+	main.go:6		0x4adfb1	488d0d28ed0000		lea rcx, ptr [rip+0xed28]
+	main.go:6		0x4adfb8	48894c2438		mov qword ptr [rsp+0x38], rcx
+	main.go:6		0x4adfbd	488d0dcce10300		lea rcx, ptr [rip+0x3e1cc]
+	main.go:6		0x4adfc4	48894c2440		mov qword ptr [rsp+0x40], rcx
+	main.go:6		0x4adfc9	8400			test byte ptr [rax], al
+	main.go:6		0x4adfcb	eb00			jmp 0x4adfcd
+	main.go:6		0x4adfcd	4889442448		mov qword ptr [rsp+0x48], rax
+	main.go:6		0x4adfd2	48c744245001000000	mov qword ptr [rsp+0x50], 0x1
+	main.go:6		0x4adfdb	48c744245801000000	mov qword ptr [rsp+0x58], 0x1
+	main.go:6		0x4adfe4	48890424		mov qword ptr [rsp], rax
+	main.go:6		0x4adfe8	48c744240801000000	mov qword ptr [rsp+0x8], 0x1
+	main.go:6		0x4adff1	48c744241001000000	mov qword ptr [rsp+0x10], 0x1
+	main.go:6		0x4adffa	e811a1ffff		call $fmt.Println
+=&gt;	main.go:7		0x4adfff	488b6c2460		mov rbp, qword ptr [rsp+0x60]
+	main.go:7		0x4ae004	4883c468		add rsp, 0x68
+	main.go:7		0x4ae008	c3			ret
+	main.go:5		0x4ae009	e8e247fbff		call $runtime.morestack_noctxt
+	&lt;autogenerated&gt;:1	0x4ae00e	e96dffffff		jmp $main.main
+</code></pre>
+<p><code>dlv</code> 默認顯示的是 <code>intel</code> 風格彙編代碼，我們可以通過 <code>config</code> 命令設置 <code>gnu</code> 或者 <code>go</code> 風格代碼：</p>
+<pre><code class="language-bash">(dlv) config disassemble-flavor go
+</code></pre>
+<p>這種方式更改的配置只會對此次調試有效，若保證下次調試一樣有效，我們需要將其配置到配置文件中。<code>dlv</code> 默認配置文件是 <code>HOME/.config/dlv/config.yml</code>。我們只需要在配置文件加入以下內容：</p>
+<pre><code class="language-yaml">disassemble-flavor: go
+</code></pre>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>https://github.com/go-delve/delve <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../analysis-tools/gdb.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../analysis-tools/go-buildin-tools.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../analysis-tools/gdb.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../analysis-tools/go-buildin-tools.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

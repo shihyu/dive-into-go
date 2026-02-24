@@ -1,0 +1,496 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Go 內置工具 - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="go-內置分析工具"><a class="header" href="#go-內置分析工具">Go 內置分析工具</a></h1>
+<p>這一章節將介紹Go 內置分析工具。通過這些工具我們可以分析、診斷、跟蹤競態，GMP調度，CPU耗用等問題。</p>
+<h2 id="go-build"><a class="header" href="#go-build">go build</a></h2>
+<p><code>go build</code>命令用來編譯Go 程序。<code>go build</code>重要的命令行選項有以下幾個：</p>
+<h3 id="go-build--n"><a class="header" href="#go-build--n">go build -n</a></h3>
+<p><code>-n</code>選項用來顯示編譯過程中所有執行的命令，不會真正執行。通過該選項我們可以查看編譯器，連接器如何工作的：</p>
+<pre><code class="language-shell">#
+# _/home/vagrant/dive-into-go
+#
+
+mkdir -p $WORK/b001/
+cat &gt;$WORK/b001/importcfg &lt;&lt; 'EOF' # internal
+# import config
+packagefile fmt=/usr/lib/go/pkg/linux_amd64/fmt.a
+packagefile runtime=/usr/lib/go/pkg/linux_amd64/runtime.a
+EOF
+cd /home/vagrant/dive-into-go
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath "$WORK/b001=&gt;" -p main -complete -buildid RcHLBQbXBa2gQVsMR6P0/RcHLBQbXBa2gQVsMR6P0 -goversion go1.14.13 -D _/home/vagrant/dive-into-go -importcfg $WORK/b001/importcfg -pack ./empty_string.go ./string.go
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/_pkg_.a # internal
+cat &gt;$WORK/b001/importcfg.link &lt;&lt; 'EOF' # internal
+packagefile _/home/vagrant/dive-into-go=$WORK/b001/_pkg_.a
+packagefile fmt=/usr/lib/go/pkg/linux_amd64/fmt.a
+packagefile runtime=/usr/lib/go/pkg/linux_amd64/runtime.a
+packagefile errors=/usr/lib/go/pkg/linux_amd64/errors.a
+packagefile internal/fmtsort=/usr/lib/go/pkg/linux_amd64/internal/fmtsort.a
+packagefile io=/usr/lib/go/pkg/linux_amd64/io.a
+packagefile math=/usr/lib/go/pkg/linux_amd64/math.a
+packagefile os=/usr/lib/go/pkg/linux_amd64/os.a
+packagefile reflect=/usr/lib/go/pkg/linux_amd64/reflect.a
+packagefile strconv=/usr/lib/go/pkg/linux_amd64/strconv.a
+packagefile sync=/usr/lib/go/pkg/linux_amd64/sync.a
+packagefile unicode/utf8=/usr/lib/go/pkg/linux_amd64/unicode/utf8.a
+packagefile internal/bytealg=/usr/lib/go/pkg/linux_amd64/internal/bytealg.a
+packagefile internal/cpu=/usr/lib/go/pkg/linux_amd64/internal/cpu.a
+packagefile runtime/internal/atomic=/usr/lib/go/pkg/linux_amd64/runtime/internal/atomic.a
+packagefile runtime/internal/math=/usr/lib/go/pkg/linux_amd64/runtime/internal/math.a
+packagefile runtime/internal/sys=/usr/lib/go/pkg/linux_amd64/runtime/internal/sys.a
+packagefile internal/reflectlite=/usr/lib/go/pkg/linux_amd64/internal/reflectlite.a
+packagefile sort=/usr/lib/go/pkg/linux_amd64/sort.a
+packagefile math/bits=/usr/lib/go/pkg/linux_amd64/math/bits.a
+packagefile internal/oserror=/usr/lib/go/pkg/linux_amd64/internal/oserror.a
+packagefile internal/poll=/usr/lib/go/pkg/linux_amd64/internal/poll.a
+packagefile internal/syscall/execenv=/usr/lib/go/pkg/linux_amd64/internal/syscall/execenv.a
+packagefile internal/syscall/unix=/usr/lib/go/pkg/linux_amd64/internal/syscall/unix.a
+packagefile internal/testlog=/usr/lib/go/pkg/linux_amd64/internal/testlog.a
+packagefile sync/atomic=/usr/lib/go/pkg/linux_amd64/sync/atomic.a
+packagefile syscall=/usr/lib/go/pkg/linux_amd64/syscall.a
+packagefile time=/usr/lib/go/pkg/linux_amd64/time.a
+packagefile unicode=/usr/lib/go/pkg/linux_amd64/unicode.a
+packagefile internal/race=/usr/lib/go/pkg/linux_amd64/internal/race.a
+EOF
+mkdir -p $WORK/b001/exe/
+cd .
+/usr/lib/go/pkg/tool/linux_amd64/link -o $WORK/b001/exe/a.out -importcfg $WORK/b001/importcfg.link -buildmode=exe -buildid=nR64Q3qx-0ZdNI4_-qJS/RcHLBQbXBa2gQVsMR6P0/RcHLBQbXBa2gQVsMR6P0/nR64Q3qx-0ZdNI4_-qJS -extld=gcc $WORK/b001/_pkg_.a
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out # internal
+mv $WORK/b001/exe/a.out dive-into-go
+</code></pre>
+<h3 id="go-build--race"><a class="header" href="#go-build--race">go build -race</a></h3>
+<p><code>-race</code>選項用來檢查代碼中是否存在競態問題。<code>-race</code>可以用在多個子命令中：</p>
+<pre><code>go test -race mypkg
+go run -race mysrc.go
+go build -race mycmd
+go install -race mypkg
+</code></pre>
+<p>下面是來自Go語言官方博客的一個示例<sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>，在該示例中演示了使用<code>-race</code>選項檢查代碼中的競態問題：</p>
+<pre><code class="language-go">func main() {
+	start := time.Now()
+	var t *time.Timer
+	t = time.AfterFunc(randomDuration(), func() {
+		fmt.Println(time.Now().Sub(start))
+		t.Reset(randomDuration())
+	})
+
+	time.Sleep(5 * time.Second)
+}
+
+func randomDuration() time.Duration {
+	return time.Duration(rand.Int63n(1e9))
+}
+</code></pre>
+<p>上面代碼完成的功能是通過<code>time.AfterFunc</code>創建定時器，該定時器會在<code>randomDuration()</code>時候打印消息，此外還會通過<code>Rest()</code>方法重置該定時器，以達到重複利用該定時器目的。</p>
+<p>當我們使用<code>-race</code>選項執行檢查時候，可以發現上面代碼是存在競態問題的：</p>
+<pre><code class="language-shell">$ go run -race main.go
+==================
+WARNING: DATA RACE
+Read by goroutine 5:
+  main.func·001()
+     race.go:14 +0x169
+
+Previous write by goroutine 1:
+  main.main()
+      race.go:15 +0x174
+
+Goroutine 5 (running) created at:
+  time.goFunc()
+      src/pkg/time/sleep.go:122 +0x56
+  timerproc()
+     src/pkg/runtime/ztime_linux_amd64.c:181 +0x189
+==================
+</code></pre>
+<h3 id="go-build--gcflags"><a class="header" href="#go-build--gcflags">go build -gcflags</a></h3>
+<p><code>-gcflags</code>選項用來設置編譯器編譯時參數，支持的參數有：</p>
+<ul>
+<li>-N選項指示禁止優化</li>
+<li>-l選項指示禁止內聯</li>
+<li>-S選項指示打印出彙編代碼</li>
+<li>-m選項指示打印出變量變量逃逸信息，<code>-m -m</code>可以打印出更豐富的變量逃逸信息</li>
+</ul>
+<p><code>-gcflags</code>支持只在編譯特定包時候才傳遞編譯參數，此時的<code>-gcflags</code>格式爲<code>包名=參數列表</code>。</p>
+<pre><code>go build -gcflags="-N -l -S"  main.go // 打印出main.go對應的彙編代碼
+go build -gcflags="log=-N -l" main.go // 只對log包進行禁止優化，禁止內聯操作
+</code></pre>
+<h2 id="go-tool-compile"><a class="header" href="#go-tool-compile">go tool compile</a></h2>
+<p><code>go tool compile</code>命令用於彙編處理Go 程序文件。<code>go tool compile</code>支持常見選項有：</p>
+<ul>
+<li>-N選項指示禁止優化</li>
+<li>-l選項指示禁止內聯</li>
+<li>-S選項指示打印出彙編代碼</li>
+<li>-m選項指示打印出變量內存逃逸信息</li>
+</ul>
+<pre><code class="language-shell">go tool compile -N -l -S main.go # 打印出main.go對應的彙編代碼
+GOOS=linux GOARCH=amd64 go tool compile -N -l -S main.go # 打印出針對特定系統和CPU架構的彙編代碼
+</code></pre>
+<h2 id="go-tool-nm"><a class="header" href="#go-tool-nm">go tool nm</a></h2>
+<p><code>go tool nm</code>命令用來查看Go 二進制文件中符號表信息。</p>
+<pre><code class="language-shell">go tool nm ./main | grep "runtime.zerobase"
+</code></pre>
+<h2 id="go-tool-objdump"><a class="header" href="#go-tool-objdump">go tool objdump</a></h2>
+<p><code>go tool objdump</code>命令用來根據目標文件或二進制文件反編譯出彙編代碼。該命令支持兩個選項：</p>
+<ul>
+<li>-S選項指示打印彙編代碼</li>
+<li>-s選項指示搜索相關的彙編代碼</li>
+</ul>
+<pre><code>go tool compile -N -l main.go # 生成main.o
+go tool objdump main.o # 打印所有彙編代碼
+go tool objdump -s "main.(main|add)" ./test # objdump支持搜索特定字符串
+</code></pre>
+<h2 id="go-tool-trace"><a class="header" href="#go-tool-trace">go tool trace</a></h2>
+<h2 id="godebug環境變量"><a class="header" href="#godebug環境變量">GODEBUG環境變量</a></h2>
+<p><code>GODEBUG</code>是控制運行時調試的變量，其參數以逗號分隔，格式爲：name=val。<code>GODEBUG</code>可以用來觀察GMP調度和GC過程。</p>
+<h3 id="gmp調度"><a class="header" href="#gmp調度">GMP調度</a></h3>
+<p>與GMP調度相關的兩個參數：</p>
+<ul>
+<li>
+<p>schedtrace：設置 schedtrace=X 參數可以使運行時在每 X 毫秒輸出一行調度器的摘要信息到標準 err 輸出中。</p>
+</li>
+<li>
+<p>scheddetail：設置 schedtrace=X 和 scheddetail=1 可以使運行時在每 X 毫秒輸出一次詳細的多行信息，信息內容主要包括調度程序、處理器、OS 線程 和 Goroutine 的狀態。</p>
+</li>
+</ul>
+<p>我們以下面代碼爲例：</p>
+<pre><code class="language-go">package main
+
+import (
+    "sync"
+    "time"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	for i := 0; i &lt; 2000; i++ {
+		wg.Add(1)
+		go func() {
+			a := 0
+
+			for i := 0; i &lt; 1e6; i++ {
+				a += 1
+			}
+
+			wg.Done()
+        }()
+        time.Sleep(100 * time.Millisecond)
+	}
+
+	wg.Wait()
+}
+</code></pre>
+<p>執行以下代碼獲取GMP調度信息：</p>
+<pre><code class="language-shell">GODEBUG=schedtrace=1000 go run ./test.go
+</code></pre>
+<p>筆者本人電腦輸出以下內容：</p>
+<pre><code class="language-shell">SCHED 0ms: gomaxprocs=8 idleprocs=6 threads=4 spinningthreads=1 idlethreads=0 runqueue=0 [0 0 0 0 0 0 0 0]
+SCHED 0ms: gomaxprocs=8 idleprocs=5 threads=3 spinningthreads=1 idlethreads=0 runqueue=0 [1 0 0 0 0 0 0 0]
+SCHED 0ms: gomaxprocs=8 idleprocs=5 threads=5 spinningthreads=1 idlethreads=0 runqueue=0 [0 0 0 0 0 0 0 0]
+SCHED 0ms: gomaxprocs=8 idleprocs=5 threads=5 spinningthreads=2 idlethreads=0 runqueue=0 [0 0 0 0 0 0 0 0]
+SCHED 1007ms: gomaxprocs=8 idleprocs=8 threads=16 spinningthreads=0 idlethreads=9 runqueue=0 [0 0 0 0 0 0 0 0]
+SCHED 1000ms: gomaxprocs=8 idleprocs=8 threads=5 spinningthreads=0 idlethreads=3 runqueue=0 [0 0 0 0 0 0 0 0]
+SCHED 2018ms: gomaxprocs=8 idleprocs=8 threads=16 spinningthreads=0 idlethreads=9 runqueue=0 [0 0 0 0 0 0 0 0]
+</code></pre>
+<p>上面輸出內容解釋說明：</p>
+<ul>
+<li>SCHED XXms: SCHED是調度日誌輸出標誌符。XXms是自程序啓動之後到輸出當前行時間</li>
+<li>gomaxprocs： P的數量，等於當前的 CPU 核心數，或者GOMAXPROCS環境變量的值</li>
+<li>idleprocs： 空閒P的數量，與gomaxprocs的差值即運行中P的數量</li>
+<li>threads： 線程數量，即M的數量</li>
+<li>spinningthreads：自旋狀態線程的數量。當M沒有找到可供其調度執行的 Goroutine 時，該線程並不會銷燬，而是出於自旋狀態</li>
+<li>idlethreads：空閒線程的數量</li>
+<li>runqueue：全局隊列中G的數量</li>
+<li>[0 0 0 0 0 0 0 0]：表示P本地隊列下G的數量，有幾個P中括號裏面就會有幾個數字</li>
+</ul>
+<h3 id="gc"><a class="header" href="#gc">GC</a></h3>
+<p>與 GC 相關的參數是 gctrace，當設置爲1時候，會輸出GC相關信息到標準錯誤輸出。使用方式示例如下：</p>
+<pre><code class="language-shell">GODEBUG=gctrace=1 go run main.go
+</code></pre>
+<p>GC 時候輸出的內容格式如下：</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>gc # @#s #%: #+#+# ms clock, #+#/#/#+# ms cpu, #-&gt;#-&gt;# MB, # MB goal, # P
+<span class="boring">}</span></code></pre></pre>
+<p>格式解釋說明如下：</p>
+<ul>
+<li><strong>gc #</strong>：GC 編號，每次 GC 時遞增</li>
+<li><strong>@#s</strong>：程序自啓動以來的時間（單位秒）</li>
+<li><strong>#%</strong>：程序自啓動以來花費在 GC 上的時間百分比</li>
+<li><strong>#+...+#</strong>：GC 各階段花費的時間，分別爲單個P的牆上時間和累計CPU時間</li>
+<li><strong>#-&gt;#-&gt;# MB</strong>：分別表示 GC 啓動時, GC 結束時, GC 活動時的堆大小</li>
+<li><strong>#MB goal</strong>：下一次觸發 GC 的內存佔用閾值</li>
+<li><strong>#P</strong>：當前使用的處理器P的數量</li>
+</ul>
+<p>比如對於下面的輸出內容，詳細解釋如下：</p>
+<blockquote>
+<p>gc 100 @0.904s 11%: 0.043+2.8+0.029 ms clock, 0.34+3.4/5.4/13.6+0.23 ms cpu, 10-&gt;11-&gt;6 MB, 12 MB goal, 8 P</p>
+</blockquote>
+<ul>
+<li><strong>gc 100</strong>：第 100 次 GC</li>
+<li><strong>@0.904s</strong>：當前時間是程序啓動後的0.904s</li>
+<li><strong>11%</strong>：程序啓動後到現在共花費 11% 的時間在 GC 上</li>
+<li><strong>0.043+2.8+0.029 ms clock</strong>
+<ul>
+<li>0.043：表示單個 P 在 mark 階段的 STW 時間</li>
+<li>2.8：表示所有 P 的 concurrent mark（併發標記）所使用的時間</li>
+<li>0.029：表示單個 P 的 markTermination 階段的 STW 時間</li>
+</ul>
+</li>
+<li><strong>0.34+3.4/5.4/0+0.23 ms cpu</strong>
+<ul>
+<li>0.34：表示整個進程在 mark 階段 STW 停頓的時間，一共0.34秒，即 0.043 * 8</li>
+<li>3.4/5.4/13.6：3.4 表示 mutator assist 佔用的時間，5.4 表示 dedicated + fractional 佔用的時間，13.6 表示 idle 佔用的時間。這三塊累計時間爲22.4，即2.8 * 8</li>
+<li>0.23 ms：0.23 表示整個進程在 markTermination 階段 STW 時間，即0.029 * 8</li>
+</ul>
+</li>
+<li><strong>10-&gt;11-&gt;6 MB</strong>
+<ul>
+<li>10：表示開始 mark 階段前的 heap_live 大小</li>
+<li>11：表示開始 markTermination 階段前的 heap_live 大小</li>
+<li>6：表示被標記對象的大小</li>
+</ul>
+</li>
+<li><strong>12 MB goal</strong>：表示下一次觸發 GC 回收的閾值是 12 MB</li>
+<li><strong>8 P</strong>：本次 GC 一共涉及8 個P</li>
+</ul>
+<h4 id="gogc參數"><a class="header" href="#gogc參數">GOGC參數</a></h4>
+<p>Go語言GC相關的另外一個參數是GOGC。GOGC 用於控制GC的處發頻率， 其值默認爲100, 這意味着直到自上次垃圾回收後heap size已經增長了100%時GC才觸發運行，live heap size每增長一倍，GC觸發運行一次。若設定GOGC=200, 則live heap size 自上次垃圾回收後，增長2倍時，GC觸發運行， 總之，其值越大則GC觸發運行頻率越低， 反之則越高。如果GOGC=off 則關閉GC。</p>
+<pre><code class="language-bash"># 表示當前應用佔用的內存是上次GC時佔用內存的兩倍時，觸發GC
+export GOGC=100
+</code></pre>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<!-- - [Introducing the Go Race Detector](https://blog.golang.org/race-detector) -->
+<ul>
+<li><a href="https://eddycjy.gitbook.io/golang/di-9-ke-gong-ju/go-tool-trace">Go 大殺器之跟蹤剖析 trace</a></li>
+<li><a href="https://pkg.go.dev/runtime#hdr-Environment_Variables">go runtime Environment Variables</a></li>
+</ul>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p><a href="https://blog.golang.org/race-detector">Introducing the Go Race Detector</a> <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../analysis-tools/dlv.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../go-assembly.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../analysis-tools/dlv.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../go-assembly.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

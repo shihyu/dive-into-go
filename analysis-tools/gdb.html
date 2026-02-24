@@ -1,0 +1,771 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>GDB - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="gdb"><a class="header" href="#gdb">GDB</a></h1>
+<p><strong>GDB</strong>（GNU symbolic Debugger）是Linux系統下的強大的調試工具，可以用來調試ada, c, c++, asm, minimal, d, fortran, objective-c, go, java,pascal 等多種語言。</p>
+<p>我們以調試 <code>go</code> 代碼爲示例來介紹GDB的使用。源碼內容如下：</p>
+<pre><code class="language-go">package main
+
+import "fmt"
+
+func add(a, b int) int {
+	sum := 0
+	sum = a + b
+	return sum
+}
+func main() {
+	sum := add(10, 20)
+	fmt.Println(sum)
+}
+</code></pre>
+<p>構建二進制應用：</p>
+<pre><code class="language-bash">go build -gcflags="-N -l" -o test main.go
+</code></pre>
+<h2 id="啓動調試"><a class="header" href="#啓動調試">啓動調試</a></h2>
+<pre><code class="language-bash">gdb ./test # 啓動調試
+gdb --args ./test arg1 arg2 # 指定參數啓動調試
+</code></pre>
+<p>進入gdb調試界面之後，執行 <code>run</code> 命令運行程序。若程序已經運行，我們可以 <code>attach</code> 該程序的進程id進行調試:</p>
+<pre><code class="language-bash">$ gdb
+(gdb) attach 1785
+</code></pre>
+<p>當執行 <code>attach</code> 命令的時候，GDB首先會在當前工作目錄下查找進程的可執行程序，如果沒有找到，接着會用源代碼文件搜索路徑。我們也可以用file命令來加載可執行文件。</p>
+<p>或者通過命令設置進程id:</p>
+<pre><code class="language-bash">gdb test 1785 
+gdb test --pid 1785
+</code></pre>
+<p>若已運行的進程不含調試信息，我們可以使用同樣代碼編譯出一個帶調試信息的版本，然後使用 <code>file</code> 和 <code>attach</code> 命令進行運行調試。</p>
+<pre><code class="language-bash">$ gdb
+(gdb) file test
+Reading symbols from test...done.
+(gdb) attach 1785
+</code></pre>
+<h3 id="可視化窗口"><a class="header" href="#可視化窗口">可視化窗口</a></h3>
+<p>GDB也支持多窗口圖形啓動運行，一個窗口顯示源碼信息，一個窗口顯示調試信息：</p>
+<pre><code class="language-bash">gdb test -tui
+</code></pre>
+<p>GDB支持在運行過程中使用 <code>Crtl+X+A</code> 組合鍵進入多窗口圖形界面， GDB支持的快捷操作有：</p>
+<pre><code class="language-bash">Crtl+X+A // 多窗口與單窗口界面切換
+Ctrl + X + 2 // 顯示兩個窗口
+Ctrl + X + 1 // 顯示一個窗口
+</code></pre>
+<h2 id="運行程序"><a class="header" href="#運行程序">運行程序</a></h2>
+<p>通過 <code>run</code> 命令運行程序， <code>run</code> 命令可以簡寫成 <code>r</code>：</p>
+<pre><code class="language-bash">(gdb) run
+</code></pre>
+<p>除了啓動GDB時候，設置程序的命令行參數外，我們也可以在啓動GDB後，再指定程序的命令行參數：</p>
+<pre><code class="language-bash">(gdb) run arg1 arg2
+</code></pre>
+<p>或者通過 <code>set</code> 命令設置命令行參數：</p>
+<pre><code class="language-bash">(gdb) set args arg1 arg2
+(gdb) run
+</code></pre>
+<p>除了 <code>run</code> 命令外，我們也可以使用 <code>start</code> 命令運行程序。<code>start</code> 命令會在在 <code>main</code> 函數的第一條語句前面停下來。</p>
+<pre><code class="language-bash">(gdb) start
+</code></pre>
+<p><code>start</code> 命令相當於在Go程序的入口函數 <code>main.main</code> (<code>main.main</code> 代表 <code>main</code> 包的 <code>main</code> 函數)處設置斷點，然後運行 <code>run</code> 命令：</p>
+<pre><code class="language-bash">(gdb) b main.main
+(gdb) run
+</code></pre>
+<h2 id="斷點的設置查看刪除禁用"><a class="header" href="#斷點的設置查看刪除禁用">斷點的設置、查看、刪除、禁用</a></h2>
+<h3 id="設置斷點"><a class="header" href="#設置斷點">設置斷點</a></h3>
+<p>GDB中是通過 <code>break</code> 命令來設置斷點(BreakPoint)，<code>break</code> 可以簡寫成 <code>b</code>。</p>
+<ul>
+<li>
+<p>break function</p>
+<p>在指定函數出設置斷點，設置斷點後程序會在進入指定函數時停住</p>
+</li>
+<li>
+<p><strong>break linenum</strong></p>
+<p>在指定行號處設置斷點</p>
+</li>
+<li>
+<p>break +offset/-offset</p>
+<p>在當前行號的前面或後面的offset行處設置斷點。offset爲自然數</p>
+</li>
+<li>
+<p>break filename:linenum</p>
+<p>在源文件filename的linenum行處設置斷點</p>
+</li>
+<li>
+<p>break filename:function</p>
+<p>在源文件filename的function函數的入口處設置斷點</p>
+</li>
+<li>
+<p><strong>break *address</strong></p>
+<p>在程序運行的內存地址處設置斷點</p>
+</li>
+<li>
+<p>break</p>
+<p>break命令沒有參數時，表示在下一條指令處停住。</p>
+</li>
+<li>
+<p>break ... if <condition></p>
+<p>...可以是上述的參數，condition表示條件，在條件成立時停住。比如在循環境體中，可以設置break if i=100，表示當i爲100時停住程序</p>
+</li>
+</ul>
+<h3 id="查看斷點"><a class="header" href="#查看斷點">查看斷點</a></h3>
+<p>我們可以通過 <code>info</code> 命令查看斷點：</p>
+<pre><code class="language-bash">(gdb) info breakpoint # 查看所有斷點
+(gdb) info breakpoint 3 # 查看3號斷點
+</code></pre>
+<h3 id="刪除斷點"><a class="header" href="#刪除斷點">刪除斷點</a></h3>
+<p>刪除斷點是通過 <code>delete</code> 命令刪除的，<code>delete</code> 命令可以簡寫成 <code>d</code>：</p>
+<pre><code class="language-bash">(gdb) delete 3 # 刪除3號斷點
+</code></pre>
+<h3 id="斷點啓用與禁用"><a class="header" href="#斷點啓用與禁用">斷點啓用與禁用</a></h3>
+<pre><code class="language-bash">(gdb) disable 3 # 禁用3號斷點
+(gdb) enable 3 # 啓用3號斷點
+</code></pre>
+<h2 id="調試"><a class="header" href="#調試">調試</a></h2>
+<h3 id="單步執行"><a class="header" href="#單步執行">單步執行</a></h3>
+<p><code>next</code> 用於單步執行，會一行行執行代碼，運到函數時候，不會進入到函數內部，跳過該函數，但會執行該函數，即 <code>step over</code>。可以簡寫成 <code>n</code>。</p>
+<pre><code class="language-bash">(gdb) next
+</code></pre>
+<h3 id="單步進入"><a class="header" href="#單步進入">單步進入</a></h3>
+<p><code>step</code> 用於單步進入執行，跟 <code>next</code> 命令類似，但是遇到函數時候，會進入到函數內部一步步執行，即 <code>step into</code>。可以簡寫成 <code>s</code>。</p>
+<pre><code class="language-bash">(gdb) step
+</code></pre>
+<p>與 <code>step</code> 相關的命令 <code>stepi</code>，用於每次執行每次執行一條機器指令。可以簡寫成 <code>si</code>。</p>
+<h3 id="繼續執行到下一個斷點"><a class="header" href="#繼續執行到下一個斷點">繼續執行到下一個斷點</a></h3>
+<p><code>continue</code> 命令會繼續執行程序，直到再次遇到斷點處。可以簡寫成 <code>c</code>:</p>
+<pre><code class="language-bash">(gdb) continue
+(gdb) continue 3 # 跳過3個斷點
+</code></pre>
+<h3 id="繼續運行到指定位置"><a class="header" href="#繼續運行到指定位置">繼續運行到指定位置</a></h3>
+<p><code>until</code> 命令可以幫助我們實現運行到某一行停住，可以簡寫成 <code>u</code>：</p>
+<pre><code class="language-bash">(gdb) until 5
+</code></pre>
+<h3 id="跳過執行"><a class="header" href="#跳過執行">跳過執行</a></h3>
+<p><code>skip</code> 命令可以在step時跳過一些不想關注的函數或者某個文件的代碼:</p>
+<pre><code class="language-bash">(gdb) skip function add   # step時跳過add函數
+(gdb) info skip   # 查看skip列表
+</code></pre>
+<p>其他相關的命令：</p>
+<ul>
+<li>skip delete [num] 刪除skip</li>
+<li>skip enable [num] 啓動skip</li>
+<li>skip disable [num] 關閉skip</li>
+</ul>
+<p><strong>注意：</strong> 當不帶skip號時候，是針對所有skip進行設置。</p>
+<h3 id="執行完成當前函數"><a class="header" href="#執行完成當前函數">執行完成當前函數</a></h3>
+<p><code>finish</code> 命令用來將當前函數執行完成，並打印函數返回時的堆棧地址、返回值、參數值等信息，即<code>step out</code> 。</p>
+<pre><code class="language-bash">(gdb) finish
+</code></pre>
+<h2 id="查看源碼"><a class="header" href="#查看源碼">查看源碼</a></h2>
+<p>GDB中的 <code>list</code> 命令用來顯示源碼信息。<code>list</code> 命令可以簡寫成 <code>l</code>。</p>
+<ul>
+<li>
+<p><strong>list</strong></p>
+<p>從第一行開始顯示源碼，繼續輸入list，可列出後面的源碼</p>
+</li>
+<li>
+<p><strong>list linenum</strong></p>
+<p>列出linenum行附近的源碼</p>
+</li>
+<li>
+<p><strong>list function</strong></p>
+<p>列出函數function的代碼</p>
+</li>
+<li>
+<p>list filename:linenum</p>
+<p>列出文件filename文件中，linenum行出的代碼</p>
+</li>
+<li>
+<p>list filename:function</p>
+<p>列出文件filename中，函數function的代碼</p>
+</li>
+<li>
+<p>list +offset/-offset</p>
+<p>列出在當前行號的前面或後面的offset行附近的代碼。offset爲自然數。</p>
+</li>
+<li>
+<p>list +/-</p>
+<p>列出當前行後面或者前面的代碼</p>
+</li>
+<li>
+<p>list linenum1, linenum2</p>
+<p>列出行linenum1和linenum2之間的代碼</p>
+</li>
+</ul>
+<h2 id="查看信息"><a class="header" href="#查看信息">查看信息</a></h2>
+<p><code>info</code> 命令用來顯示信息，可以簡寫成 <code>i</code>。</p>
+<ul>
+<li>
+<p><strong>info files</strong></p>
+<p>顯示當前的調試的文件，包含程序入口地址，內存分段佈局位置信息等</p>
+</li>
+<li>
+<p>info breakpoints</p>
+<p>顯示當前設置的斷點列表</p>
+</li>
+<li>
+<p>info registers</p>
+<p>顯示當前寄存器的值，可以簡寫成 <code>i r</code>。指定寄存器名稱，可以查看具體寄存器信息：<code>i r rsp</code></p>
+</li>
+<li>
+<p>info all-registers</p>
+<p>顯示所有寄存器的值。GDB提供四個標準寄存器：<code>pc</code> 是程序計數器寄存器，<code>sp</code> 是堆棧指針。<code>fp</code> 用於記錄當前堆棧幀的指針，<code>ps</code> 用於記錄處理器狀態的寄存器。GDB會處理好不同架構系統寄存器不一致問題，比如對於 <code>amd64</code> 架構，<code>pc</code> 對應就是 <code>rip</code> 寄存器。</p>
+<p>引用寄存器內容是將寄存器名前置 <code>$</code> 符作爲變量來用。比如 <code>$pc</code> 就是程序計數器寄存器值。</p>
+</li>
+<li>
+<p>info args</p>
+<p>顯示當前函數參數</p>
+</li>
+<li>
+<p>info locals</p>
+<p>顯示當前局部變量</p>
+</li>
+<li>
+<p><strong>info frame</strong></p>
+<p>查看當前棧幀的詳細信息，包括 <code>rip</code> 信息，正在運行的指令所在文件位置</p>
+</li>
+<li>
+<p>info variables</p>
+<p>查看程序中的變量符號</p>
+</li>
+<li>
+<p>info functions</p>
+<p>查看程序中的函數符號</p>
+</li>
+<li>
+<p>info functions regexp</p>
+<p>通過正則匹配來查看程序中的函數符號</p>
+</li>
+<li>
+<p>info goroutines</p>
+<p>顯示當前執行的 <code>goroutine</code> 列表，帶 <code>*</code> 的表示當前執行的。注意需要加載 <code>go runtime</code> 支持。</p>
+</li>
+<li>
+<p>info stack</p>
+<p>查看棧信息</p>
+</li>
+<li>
+<p>info proc mappings</p>
+<p>可以簡寫成 <code>i proc m</code>。用來查看應用內存映射</p>
+</li>
+<li>
+<p>info proc [procid]</p>
+<p>顯示進程信息</p>
+</li>
+<li>
+<p>info proc status</p>
+<p>顯示進程相關信息：包括user id和group id；進程內有多少線程；虛擬內存的使用情況；掛起的信號，阻塞的信號，忽略的信號；TTY；消耗的系統和用戶時間；堆棧大小；nice值</p>
+</li>
+<li>
+<p>info display</p>
+</li>
+<li>
+<p>info watchpoints</p>
+<p>列出當前所設置了的所有觀察點</p>
+</li>
+<li>
+<p>info line [linenum]</p>
+<p>查看第 <code>linenum</code> 的代碼指令地址信息，不帶 <code>linenum</code> 時，顯示的是當前位置的指令地址信息</p>
+</li>
+<li>
+<p>info source</p>
+<p>顯示此源代碼的源代碼語言</p>
+</li>
+<li>
+<p>info sources</p>
+<p>顯示程序中所有有調試信息的源文件名，一共顯示兩個列表：一個是其符號信息已經讀過的，一個是還未讀取過的</p>
+</li>
+<li>
+<p>info types</p>
+<p>顯示程序中所有類型符號</p>
+</li>
+<li>
+<p>info types regexp</p>
+<p>通過正則匹配來查看程序中的類型符號</p>
+</li>
+</ul>
+<p>其他類似命令有：</p>
+<ul>
+<li>
+<p>show args</p>
+<p>查看命令行參數</p>
+</li>
+<li>
+<p>show environment [envname]</p>
+<p>查看環境變量信息</p>
+</li>
+<li>
+<p>show paths</p>
+<p>查看程序的運行路徑</p>
+</li>
+<li>
+<p>whatis var1</p>
+<p>顯示變量var1類型</p>
+</li>
+<li>
+<p>ptype var1</p>
+<p>顯示變量 <code>var1</code> 類型，若是 <code>var1</code> 結構體類型，會顯示該結構體定義信息。</p>
+</li>
+</ul>
+<h2 id="查看調用棧"><a class="header" href="#查看調用棧">查看調用棧</a></h2>
+<p>通過 <code>where</code> 可以查看調用棧信息：</p>
+<pre><code class="language-bash">(gdb) where
+#0  _rt0_amd64 ()
+    at /usr/lib/go/src/runtime/asm_amd64.s:15
+#1  0x0000000000000001 in ?? ()
+#2  0x00007fffffffdd2c in ?? ()
+#3  0x0000000000000000 in ?? ()
+</code></pre>
+<h2 id="設置觀察點"><a class="header" href="#設置觀察點">設置觀察點</a></h2>
+<p>通過 <code>watch</code> 命令，可以設置觀察點。當觀察點的變量發生變化時，程序會停下來。可以簡寫成 <code>wa</code></p>
+<pre><code class="language-bash">(gdb) watch sum
+</code></pre>
+<h2 id="查看彙編代碼"><a class="header" href="#查看彙編代碼">查看彙編代碼</a></h2>
+<p>我們可以通過開啓 <code>disassemble-next-line</code> 自動顯示彙編代碼。</p>
+<pre><code class="language-bash">(gdb) set disassemble-next-line on
+</code></pre>
+<p>當面我們可以查看指定函數的彙編代碼：</p>
+<pre><code class="language-bash">(gdb) disassemble main.main
+</code></pre>
+<p><code>disassemble</code> 可以簡寫成 <code>disas</code>。我們也可以將源代碼和彙編代碼一一映射起來後進行查看</p>
+<pre><code class="language-bash">(gdb) disas /m main.main
+</code></pre>
+<p>GDB默認顯示彙編指令格式是 <code>AT&amp;T</code> 格式，我們可以改成 <code>intel</code> 格式：</p>
+<pre><code class="language-bash">(gdb) set disassembly-flavor intel
+</code></pre>
+<h2 id="自動顯示變量值"><a class="header" href="#自動顯示變量值">自動顯示變量值</a></h2>
+<p><code>display</code> 命令支持自動顯示變量值功能。當進行 <code>next</code> 或者 <code>step</code> 等調試操作時候，GDB會自動顯示 <code>display</code> 所設置的變量或者地址的值信息。</p>
+<p><code>display</code> 命令格式：</p>
+<pre><code class="language-bash">display &lt;expr&gt;
+display /&lt;fmt&gt; &lt;expr&gt;
+display /&lt;fmt&gt; &lt;addr&gt;
+</code></pre>
+<ul>
+<li>expr是一個表達式</li>
+<li>fmt表示顯示的格式</li>
+<li>addr表示內存地址</li>
+</ul>
+<p>其他相關命令：</p>
+<ul>
+<li>undisplay [num]: 不顯示</li>
+<li>delete display [num]: 刪除</li>
+<li>disable display [num]: 關閉自動顯示</li>
+<li>enable display [num]： 開啓自動顯示</li>
+<li>info display: 查看display信息</li>
+</ul>
+<p><strong>注意：</strong> 當不帶display號時候，是針對所有display進行設置。</p>
+<h2 id="顯示將要執行的彙編指令"><a class="header" href="#顯示將要執行的彙編指令">顯示將要執行的彙編指令</a></h2>
+<p>我們可以通過 <code>display</code> 命令可以實現當程序停止時，查看將要執行的彙編指令：</p>
+<pre><code class="language-bash">(gdb) display /i $pc
+(gdb) display /3i $pc # 一次性顯示3條指令
+</code></pre>
+<p>取消顯示可以用 <code>undisplay</code> 命令進行操作。</p>
+<h2 id="查看backtrace信息"><a class="header" href="#查看backtrace信息">查看backtrace信息</a></h2>
+<p><code>backtrace</code> 命令用來查看棧幀信息。可以簡寫成 <code>bt</code>。</p>
+<pre><code class="language-bash">(gdb) backtrace # 顯示當前函數的棧幀以及局部變量信息
+(gdb) backtrace full # 顯示各個函數的棧幀以及局部變量值
+(gdb) backtrace full n # 從內向外顯示n個棧楨，及其局部變量
+(gdb) backtrace full -n # 從外向內顯示n個棧楨，及其局部變量
+</code></pre>
+<h2 id="切換棧幀信息"><a class="header" href="#切換棧幀信息">切換棧幀信息</a></h2>
+<p><code>frame</code> 命令可以切換棧幀信息：</p>
+<pre><code class="language-bash">(gdb) frame n # 其中n是層數，最內層的函數幀爲第0幀
+</code></pre>
+<p>其他相關命令：</p>
+<ul>
+<li>info frame: 查看棧幀列表</li>
+</ul>
+<h2 id="調試多線程"><a class="header" href="#調試多線程">調試多線程</a></h2>
+<p>GDB中有一組命令能夠輔助多線程的調試：</p>
+<ul>
+<li>
+<p>info threads</p>
+<p>顯示當前可調式的所有線程，線程 ID 前有 “*” 表示當前被調試的線程。</p>
+</li>
+<li>
+<p>thread threadid</p>
+<p>切換線程到線程threadid</p>
+</li>
+<li>
+<p>set scheduler-locking [on|off|step]</p>
+<p>多線程環境下，會存在多個線程運行，這會影響調試某個線程的結果，這個命令可以設置調試的時候多個線程的運行情況，<code>on</code> 表示只有當前調試的線程會繼續執行，<code>off</code> 表示不屏蔽任何線程，所有線程都可以執行，<code>step</code> 表示在單步執行時，只有當前線程會執行。</p>
+</li>
+<li>
+<p>thread apply [threadid] [all] args</p>
+<p>對線程列表執行命令。比如通過 <code>thread apply all bt full</code> 可以查看所有線程的局部變量信息。</p>
+</li>
+</ul>
+<h2 id="查看運行時變量"><a class="header" href="#查看運行時變量">查看運行時變量</a></h2>
+<p><code>print</code> 命令可以用來查看變量的值。<code>print</code> 命令可以簡寫成 <code>p</code>。<code>print</code> 命令格式如下：</p>
+<pre><code class="language-bash">print [&lt;/format&gt;] &lt;expr&gt;
+</code></pre>
+<p><code>format</code> 用來設置顯示變量的格式，是可選的選項。其可用值如下所示：</p>
+<ul>
+<li>x 按十六進制格式顯示變量</li>
+<li>d 按十進制格式顯示變量</li>
+<li>u 按十六進制格式顯示無符號整型</li>
+<li>o 按八進制格式顯示變量</li>
+<li>t 按二進制格式顯示變量</li>
+<li>a 按十六進制格式顯示變量</li>
+<li>c 按字符格式顯示變量</li>
+<li>f 按浮點數格式顯示變量</li>
+<li>z 按十六進制格式顯示變量，左側填充零</li>
+</ul>
+<p><code>expr</code> 可以是一個變量，也可以是表達式，也可以是寄存器：</p>
+<pre><code class="language-bash">(gdb) p var1 # 打印變量var1
+(gdb) p &amp;var1 # 打印變量var1地址
+(gdb) p $rsp # 打印rsp寄存器地址
+(gdb) p $rsp + 8 # 打印rsp加8後的地址信息
+(gdb) p 0xc000068fd0 # 打印0xc000068fd0轉換成10進制格式
+(gdb) p /x 824634150864 # 打印824634150864轉換成16進制格式
+</code></pre>
+<p><code>print</code> 也支持查看連續內存，<code>@</code> 操作符用於查看連續內存，<code>@</code> 的左邊是第一個內存的地址的值，<code>@</code> 的右邊則想查看內存的長度。</p>
+<p>例如對於如下代碼：<code>int arr[] = {2, 4, 6, 8, 10};</code>，可以通過如下命令查看 <code>arr</code> 前三個單元的數據：</p>
+<pre><code class="language-bash">(gdb) p *arr@3
+$2 = {2, 4, 6}
+</code></pre>
+<h2 id="查看內存中的值"><a class="header" href="#查看內存中的值">查看內存中的值</a></h2>
+<p><code>examine</code> 命令用來查看內存地址中的值，可以簡寫成 <code>x</code>。<code>examine</code> 命令的語法如下所示：</p>
+<pre><code class="language-bash">examine /&lt;n/f/u&gt; &lt;addr&gt;
+</code></pre>
+<ul>
+<li>
+<p>n 表示顯示字段的長度，也就是說從當前地址向後顯示幾個地址的內容。</p>
+</li>
+<li>
+<p>f 表示顯示的格式</p>
+<ul>
+<li>d 數字 decimal</li>
+<li>u 無符號數字 unsigned decimal</li>
+<li>s 字符串 string</li>
+<li>c 字符 char</li>
+<li>u 無符號整數 unsigned integer</li>
+<li>t 二進制 binary</li>
+<li>o 八進制格式 octal</li>
+<li>x 十六進制格式 hex</li>
+<li>f 浮點數格式 float</li>
+<li>i 指令 instruction</li>
+<li>a 地址 address</li>
+<li>z 十六進制格式，左側填充零 hex, zero padded on the left</li>
+</ul>
+</li>
+<li>
+<p>u 表示從當前地址往後請求的字節數，默認是4個bytes</p>
+<ul>
+<li>b 一個字節 byte</li>
+<li>h 兩個字節 halfword</li>
+<li>w 四個字節 word</li>
+<li>g 八個字節 giantword</li>
+</ul>
+</li>
+</ul>
+<p>示例：</p>
+<pre><code class="language-bash">(gdb) x/10c 0x4005d4 # 打印前10個字符
+(gdb) x/16xb a # 以16進制格式打印數組前a16個byte的值
+(gdb) x/16ub a # 以無符號10進制格式打印數組a前16個byte的值
+(gdb) x/16tb a # 以2進制格式打印數組前16個abyte的值
+(gdb) x/16xw a # 以16進制格式打印數組a前16個word（4個byte）的值
+(gdb) x $rsp # 打印rsp寄存器執行的地址的值
+(gdb) x $rsp + 8 # 打印rsp加8後的地址指向的值
+(gdb) x 0xc000068fd0 # 打印內存0xc000068fd0指向的值
+(gdb) x/5i schedule # 打印函數schedule前5條指令
+</code></pre>
+<h2 id="修改變量或寄存器值"><a class="header" href="#修改變量或寄存器值">修改變量或寄存器值</a></h2>
+<p><code>set</code> 命令支持修改變量以及寄存器的值：</p>
+<pre><code class="language-bash">(gdb) set var var1=123 # 設置變量var1值爲123
+(gdb) set var $rax=123 # 設置寄存器值爲123
+(gdb) set environment envname1=123 # 設置環境變量envname1值爲123
+</code></pre>
+<h2 id="查看命令幫助信息"><a class="header" href="#查看命令幫助信息">查看命令幫助信息</a></h2>
+<p><code>help</code> 命令支持查看GDB命令幫助信息。</p>
+<pre><code class="language-bash">(gdb) help status # 查看所有命令使用示例
+(gdb) help x # 查看x命令使用幫助
+</code></pre>
+<h2 id="搜索源文件"><a class="header" href="#搜索源文件">搜索源文件</a></h2>
+<p><code>search</code> 命令支持在當前文件中使用正則表達式搜索內容。<code>search</code> 等效於 <code>forward-search</code> 命令，是從當前位置向前搜索，可以簡寫成 <code>fo</code>。<code>reverse-search</code> 命令功能跟 <code>forward-search</code> 恰好相反，其可以簡寫成 <code>rev</code>。</p>
+<pre><code class="language-bash">(gdb) search func add # 從當前位置向前搜索add方法
+(gdb) rev func add # 從當前爲向後搜索add方法
+</code></pre>
+<h2 id="執行shell命令"><a class="header" href="#執行shell命令">執行shell命令</a></h2>
+<p>我們可以通過 <code>shell</code> 指令來執行shell命令。</p>
+<pre><code class="language-bash">(gdb) shell cat /proc/27889/maps # 查看進程27889的內存映射。若想查看當前進程id，可以使用info proc命令獲取
+(gdb) shell ls -alh
+</code></pre>
+<h2 id="gdb對go-runtime支持"><a class="header" href="#gdb對go-runtime支持">GDB對go runtime支持</a></h2>
+<ul>
+<li>runtime.Breakpoint()：觸發調試器斷點。</li>
+<li>runtime/debug.PrintStack()：顯示調試堆棧。</li>
+<li>log：適合替代 print顯示調試信息</li>
+</ul>
+<h2 id="爲系統調用設置捕獲點"><a class="header" href="#爲系統調用設置捕獲點">爲系統調用設置捕獲點</a></h2>
+<p>GDB支持爲系統調用設置捕獲點(catchpoint)，我們可以通過 <code>catch</code> 指令，後面加上 <strong>系統調用號(syscall numbers)</strong><sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup> 或者<strong>系統調用助記符(syscall mnemonic names，也稱爲系統調用名稱)</strong> 來設置捕獲點。如果不指定系統調用的話，默認是捕獲所有系統調用。</p>
+<pre><code class="language-shell">(gdb) catch syscall 231
+Catchpoint 1 (syscall 'exit_group' [231])
+(gdb) catch syscall exit_group
+Catchpoint 2 (syscall 'exit_group' [231])
+(gdb) catch syscall
+Catchpoint 3 (any syscall)
+</code></pre>
+<h2 id="設置源文件查找路徑"><a class="header" href="#設置源文件查找路徑">設置源文件查找路徑</a></h2>
+<p>在程序調試過程中，構建程序的源文件位置更改之後，gdb不能找到源文件位置，我們可以使用 <code>directory</code>命令設置查找源文件的路徑。</p>
+<pre><code class="language-bash">directory ~/www/go/src/github.com/go-delve/
+</code></pre>
+<p><code>directory</code> 命令只使用相對路徑下的源文件，若絕對路徑下源文件找不到，我們可以使用 <code>set substitute-path</code> 設置路徑替換。</p>
+<pre><code class="language-bash">set substitute-path ~/www/go/src/github.com/go-delve/ ~/www/go/src/github.com/go-delve2/
+</code></pre>
+<h2 id="批量執行命令"><a class="header" href="#批量執行命令">批量執行命令</a></h2>
+<p>GDB支持以腳本形式運行命令，我們可以使用下面的選項：</p>
+<ul>
+<li><code>-ex</code>選項可以用來指定執行命令</li>
+<li><code>-iex</code>選來用來指定加載應用程序之前需執行的命令</li>
+<li><code>-x</code> 選項用來從指定文件中加載命令</li>
+<li><code>-batch</code>類似<code>-q</code>，支持安靜模式，會指示GDB在所有命令執行完成之後，退出</li>
+</ul>
+<pre><code class="language-bash"># 1. 打印提示語 2. 在main.main出設置斷點 3. 運行程序 4. 執行完成程序退出gdb
+gdb -iex 'echo 開始執行:\n' -ex "b main.main" -ex "run" -batch ./main
+
+# 設置exit/exit_group系統調用追蹤點，然後運行程序，最後打印backtrace信息
+gdb -ex "catch syscall exit exit_group" -ex "run" -ex "bt" -batch ./main
+
+# 從文件中加載命令
+gdb -batch -x /tmp/cmds --args executablename arg1 arg2 arg3
+</code></pre>
+<h2 id="gdb增強插件"><a class="header" href="#gdb增強插件">GDB增強插件</a></h2>
+<ul>
+<li><a href="https://github.com/gdbinit/gdbinit">gdbinit</a></li>
+<li><a href="https://github.com/cyrus-and/gdb-dashboard">gdb-dashboard</a></li>
+<li><a href="https://github.com/pwndbg/pwndbg">pwndbg</a></li>
+<li><a href="https://github.com/longld/peda">peda</a></li>
+</ul>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<ul>
+<li><a href="http://beej.us/guide/bggdb/">Beej's Quick Guide to GDB</a></li>
+<li><a href="https://wizardforcel.gitbooks.io/100-gdb-tips/content/index.html">100個gdb小技巧</a></li>
+</ul>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>https://x64.syscall.sh/ <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../analysis-tools/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../analysis-tools/dlv.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../analysis-tools/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../analysis-tools/dlv.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

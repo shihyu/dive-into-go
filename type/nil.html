@@ -1,0 +1,437 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>nil - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="nil"><a class="header" href="#nil">nil</a></h1>
+<p>在探究 <code>nil</code> 之前，我們先看看零值的概念。</p>
+<h2 id="零值"><a class="header" href="#零值">零值</a></h2>
+<p><strong>零值(zero value)</strong><sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup> 指的是當聲明變量且未顯示初始化時，Go語言會自動給變量賦予一個默認初始值。對於值類型變量來說不同值類型，有不同的零值，比如整數型零值是 <code>0</code>，字符串類型是 <code>""</code>，布爾類型是 <code>false</code>。對於引用類型變量其零值都是 <code>nil</code>。</p>
+<div class="table-wrapper"><table><thead><tr><th>類型</th><th>零值</th></tr></thead><tbody>
+<tr><td>數值類型</td><td>0</td></tr>
+<tr><td>字符串</td><td>""</td></tr>
+<tr><td>布爾類型</td><td>false</td></tr>
+<tr><td>指針類型</td><td>nil</td></tr>
+<tr><td>通道</td><td>nil</td></tr>
+<tr><td>函數</td><td>nil</td></tr>
+<tr><td>接口</td><td>nil</td></tr>
+<tr><td>映射</td><td>nil</td></tr>
+<tr><td>切片</td><td>nil</td></tr>
+<tr><td>結構體</td><td>每個結構體字段對應類型的零值</td></tr>
+<tr><td>自定義類型</td><td>其底層類型的對應的零值</td></tr>
+</tbody></table>
+</div>
+<p>從零值的定義，可以看出Go語言引入 <code>nil</code> 概念，是爲了將其作爲引用類型變量的零值而存在。</p>
+<h2 id="nil-1"><a class="header" href="#nil-1">nil</a></h2>
+<p><code>nil</code> 是Go語言中的一個變量，是預先聲明的標識符，用來作爲引用類型變量的零值。</p>
+<pre><code class="language-go">// nil is a predeclared identifier representing the zero value for a
+// pointer, channel, func, interface, map, or slice type.
+var nil Type // Type must be a pointer, channel, func, interface, map, or slice type
+</code></pre>
+<p><code>nil</code> 不能通過:=方式賦值給一個變量，下面代碼是編譯不通過的：</p>
+<pre><code class="language-go">a := nil
+</code></pre>
+<p>上面代碼編譯不通過是因爲Go語言是無法通過 <code>nil</code> 自動推斷出a的類型，而Go語言是強類型的，每個變量都必須明確其類型。將 <code>nil</code> 賦值一個變量是可以的：</p>
+<pre><code class="language-go">var a chan int
+a = nil
+
+b := make([]int, 5)
+b = nil
+</code></pre>
+<h3 id="與nil進行比較"><a class="header" href="#與nil進行比較">與nil進行比較</a></h3>
+<h4 id="nil-與-nil比較"><a class="header" href="#nil-與-nil比較">nil 與 nil比較</a></h4>
+<p><code>nil</code> 是不能和 <code>nil</code> 比較的：</p>
+<pre><code class="language-go">func main() {
+	fmt.Println(nil == nil) // 報錯：invalid operation: nil == nil (operator == not defined on nil)
+}
+</code></pre>
+<h4 id="nil-與-指針類型變量通道切片函數映射比較"><a class="header" href="#nil-與-指針類型變量通道切片函數映射比較">nil 與 指針類型變量、通道、切片、函數、映射比較</a></h4>
+<p><code>nil</code> 是可以和指針類型變量，通道、切片、函數、映射比較的。</p>
+<ol>
+<li>對於指針類型變量，只有其未指向任何對象時候，才能等於 <code>nil</code>：</li>
+</ol>
+<pre><code class="language-go">func main() {
+	var p *int
+	println(p == nil) // true
+	a := 100
+	p = &amp;a
+	println(p == nil) // false
+}
+</code></pre>
+<ol start="2">
+<li>對於通道、切片、映射只有 <code>var t T</code> 或者手動賦值爲nil時候(<code>t = nil</code>)，才能等於nil:</li>
+</ol>
+<pre><code class="language-go">func main() {
+	// 通道
+	var ch chan int
+	println(ch == nil) // true
+	ch = make(chan int, 0)
+	println(ch == nil) // false
+
+	ch1 := make(chan int, 0)
+	println(ch1 == nil) // false
+	ch1 = nil
+	println(ch1 == nil) // true
+
+	// 切片
+	var s []int // 此時s是nil slice
+	println(s == nil) // true
+	s = make([]int, 0, 0) // 此時s是empty slice
+	println(s == nil) // false
+
+	// 映射
+	var m map[int]int // 此時m是nil map
+	println(m == nil) // true
+	m = make(map[int]int, 0)
+	println(m == nil) // false
+
+	// 函數
+	var fn func()
+	println(fn == nil)
+	fn = func() {
+	}
+	println(fn == nil)
+}
+</code></pre>
+<p>從上面可以看到，通過make函數初始化的變量都不等於 <code>nil</code>。</p>
+<h4 id="nil-與-接口比較"><a class="header" href="#nil-與-接口比較">nil 與 接口比較</a></h4>
+<p>接口類型變量包含兩個基礎屬性：<code>Type</code> 和 <code>Value</code>，<code>Type</code> 指的是接口類型變量的底層類型，<code>Value</code> 指的是接口類型變量的底層值。<strong>接口類型變量是可以比較的</strong>。<strong>當它們具有相同的底層類型，且相等的底層值時候，或者兩者都爲nil時候，這兩個接口值是相等的</strong>。</p>
+<p>當 <code>nil</code> 與接口比較時候，需要接口的 <code>Type</code> 和 <code>Value</code>都是 <code>nil</code> 時候，兩者才相等：</p>
+<pre><code class="language-go">func main() {
+	var p *int
+	var i interface{}                   // (T=nil, V=nil)
+	println(p == nil)                   // true
+	println(i == nil)                   // true
+	var pi interface{} = interface{}(p) // (T=*int, V= nil)
+	println(pi == nil)                  // false
+	println(pi == i)                    // fasle
+	println(p == i)                     // false。跟上面強制轉換p一樣。當變量和接口比較時候，會隱式將其轉換成接口
+
+	var a interface{} = nil // (T=nil, V=nil)
+	println(a == nil) // true
+	var a2 interface{} = (*interface{})(nil) // (T=*interface{}, V=nil)
+	println(a2 == nil) // false
+	var a3 interface{} = (interface{})(nil) // (T=nil, V=nil)
+	println(a3 == nil) // true
+}
+</code></pre>
+<p><code>nil</code> 和接口比較最容易出錯的場景是使用error接口時候。Go官方文檔舉了一個例子 <strong><a href="https://golang.org/doc/faq#nil_error">Why is my nil error value not equal to nil?</a></strong>:</p>
+<pre><code class="language-go">type MyError int
+func (e *MyError) Error() string {
+    return "errCode " + string(int)
+}
+
+func returnError() error {
+	var p *MyError = nil
+	if bad() { // 出現錯誤時候，返回MyError
+		p = &amp;MyError(401)
+	}
+	// println(p == nil) // 輸出true
+	return p
+}
+
+func checkError(err error) {
+	if err == nil {
+		println("nil")
+		return
+	}
+	println("not nil")
+}
+
+err := returnError() // 假定returnsError函數中bad()返回false
+println(err == nil) // false
+checkError(err) // 輸出not nil
+</code></pre>
+<p>我們可以看到上面代碼中 <code>checkError</code> 函數輸出的並不是 <code>nil</code>，而是 <code>not nil</code>。這是因爲接口類型變量 <code>err</code> 的底層類型是 <code>(T=*MyError, V=nil)</code>，不再是 <code>(T=nil, V=nil)</code>。解決辦法是當需返回 <code>nil</code> 時候，直接返回 <code>nil</code>。</p>
+<pre><code class="language-go">func returnError() error {
+	if bad() { // 出現錯誤時候，返回MyError
+		return &amp;MyError(401)
+	}
+	return p
+}
+</code></pre>
+<h3 id="幾個值爲nil的特別變量"><a class="header" href="#幾個值爲nil的特別變量">幾個值爲nil的特別變量</a></h3>
+<h4 id="nil通道"><a class="header" href="#nil通道">nil通道</a></h4>
+<p>通道類型變量的零值是 <code>nil</code>，對於等於 <code>nil</code> 的通道稱爲 <code>nil通道</code>。當從 <code>nil通道</code> 讀取或寫入數據時候，會發生永久性阻塞，若關閉則會發生恐慌。<code>nil通道</code> 存在的意義可以參考 <strong><a href="https://medium.com/justforfunc/why-are-there-nil-channels-in-go-9877cc0b2308">Why are there nil channels in Go?</a></strong></p>
+<h4 id="nil切片"><a class="header" href="#nil切片">nil切片</a></h4>
+<p>對 <code>nil切片</code> 進行讀寫操作時候會發生恐慌。但對 <code>nil切片</code> 進行 <code>append</code> 操作時候是可以的，這是因爲Go語言對append操作做了特殊處理。</p>
+<pre><code class="language-go">var s []int
+s[0] = 1 // panic: runtime error: index out of range [0] with length 0
+println(s[0]) // panic: runtime error: index out of range [0] with length 0
+s = append(s, 100) // ok
+</code></pre>
+<h4 id="nil映射"><a class="header" href="#nil映射">nil映射</a></h4>
+<p>我們可以對 <code>nil映射</code> 進行讀取和刪除操作，當進行讀取操作時候會返回映射的零值。當進行寫操作時候會發生恐慌。</p>
+<pre><code class="language-go">func main() {
+	var m map[int]int
+	println(m[100]) // print 0
+	delete(m, 1)
+	m[100] = 100 // panic: assignment to entry in nil map
+}
+</code></pre>
+<h4 id="nil接收者"><a class="header" href="#nil接收者">nil接收者</a></h4>
+<p>值爲 <code>nil</code> 的變量可以作爲函數的接收者：</p>
+<pre><code class="language-go">const defaultPath = "/usr/bin/"
+
+type Config struct {
+	path string
+}
+
+func (c *Config) Path() string {
+	if c == nil {
+		return defaultPath
+	}
+	return c.path
+}
+
+func main() {
+	var c1 *Config
+	var c2 = &amp;Config{
+		path: "/usr/local/bin/",
+	}
+	fmt.Println(c1.Path(), c2.Path())
+}
+</code></pre>
+<h4 id="nil函數"><a class="header" href="#nil函數">nil函數</a></h4>
+<p><code>nil函數</code> 可以用來處理默認值情況：</p>
+<pre><code class="language-go">func NewServer(logger function) {
+	if logger == nil {
+		logger = log.Printf  // default
+	}
+	logger.DoSomething...
+}
+</code></pre>
+<h2 id="參考資料"><a class="header" href="#參考資料">參考資料</a></h2>
+<ul>
+<li><a href="https://juejin.cn/post/6895231755091968013">Golang 零值、空值與空結構</a></li>
+<li><a href="https://medium.com/justforfunc/why-are-there-nil-channels-in-go-9877cc0b2308">Why are there nil channels in Go?</a></li>
+</ul>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p><a href="https://go.dev/ref/spec#The_zero_value">Go官方語法指南：零值的定義</a> <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../type/slice.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../type/empty_struct.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../type/slice.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../type/empty_struct.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

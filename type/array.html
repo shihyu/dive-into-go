@@ -1,0 +1,450 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>數組 - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="數組"><a class="header" href="#數組">數組</a></h1>
+<p>數組是Go語言中常見的數據結構，相比切片，數組我們使用的比較少。</p>
+<h2 id="初始化"><a class="header" href="#初始化">初始化</a></h2>
+<p>Go語言數組有兩個聲明初始化方式，一種需要顯示指明數組大小，另一種使用 <code>...</code> 保留字， 數組的長度將由編譯器在編譯階段推斷出來：</p>
+<pre><code class="language-go">arr1 := [3]int{1, 2, 3} // 使用[n]T方式
+arr2 := [...]int{1, 2, 3} // 使用[...]T方式
+arr3 := [3]int{2: 3} // 使用[n]T方式
+arr4 := [...]int{2: 3} // 使用[...]T方式
+</code></pre>
+<blockquote>
+<p><strong>警告</strong>
+<strong>注意：</strong></p>
+<p>上面代碼中 <code>arr3</code> 和 <code>arr4</code> 的初始化方式是指定數組索引對應的值。實際使用中這種方式並不常見。</p>
+</blockquote>
+<h2 id="可比較性"><a class="header" href="#可比較性">可比較性</a></h2>
+<p>數組大小是數組類型的一部分，只有數組大小和數組元素類型一樣的數組纔能夠進行比較。</p>
+<pre><code class="language-go">
+func main() {
+	var a1  [3]int
+	var a2  [3]int
+	var a3  [5]int
+	fmt.Println(a1 == a2) // 輸出true
+	fmt.Println(a1 == a3) // 不能夠比較，會報編譯錯誤： invalid operation: a1 == a3 (mismatched types [3]int and [5]int)
+}
+</code></pre>
+<h2 id="值類型"><a class="header" href="#值類型">值類型</a></h2>
+<p>Go語言中數組是一個值類型變量，將一個數組作爲函數參數傳遞是拷貝原數組形成一個新數組傳遞，在函數裏面對數組做任何更改都不會影響原數組：</p>
+<pre><code class="language-go">func passArr(arr [3]int) {
+	arr[0] = arr[0] * 100
+}
+
+func main() {
+	myArr := [3]int{1, 3, 5}
+	passArr(myArr)
+	fmt.Println(myArr[0]) // 輸出1
+}
+</code></pre>
+<h2 id="空間局部性與時間局部性"><a class="header" href="#空間局部性與時間局部性">空間局部性與時間局部性</a></h2>
+<p>CPU訪問數據時候，趨於訪問同一片內存區域的數據，這個稱爲 <strong>局部性原理（principle of locality）</strong>。局部性原理可以爲細分爲 <strong>空間局部性（Spatial Locality）</strong> 和 <strong>時間局部性（Temporal Locality）</strong>。</p>
+<ul>
+<li>
+<p>空間局部性</p>
+<p>指的是如果一個位置的數據被訪問，那麼它周圍的數據也有可能被訪問到。</p>
+</li>
+<li>
+<p>時間局部性</p>
+<p>指的是如果一個位置的數據被訪問到，那麼它下一次還是很有可能被訪問到。所以我們可以把最近訪問的數據緩存起來，內存淘汰算法LRU就是基於這個原理。</p>
+</li>
+</ul>
+<p>我們知道數組內存空間是連續分配的，比如對於[3][5]int類型數組其內存空間分配使用如下圖所示：</p>
+<p><img src="../images/202104/array_memory_alloc.png" alt="二維數組內存佈局" /></p>
+<p>觀察上面的二維數組的內存佈局，我們可以得出對於 <code>[m][n]T</code> 類型的數組中任一個元素內存地址的計算公式是：</p>
+<pre><code>數組元素的內存地址 = 第一個數組元素的內存地址 + 該元素跨過了多少行 * 元素類型大小 + 該元素在當前行的位置 * 元素類型大小
+</code></pre>
+<p>轉換成僞碼的實現如下：</p>
+<pre><code class="language-go">address(arr[x][y]) = address(arr[0][0]) + x * n * sizeof(T) + y * sizeof(T)
+				   = address(arr[0][0]) + (x * n + y) * sizeof(T)
+</code></pre>
+<p>下面我們根據上面公式來訪問數組中元素，下面代碼中使用到了 <code>uintptr</code> 和 <code>unsafe.Pointer</code>，如果不太瞭解的話可以看本書的 《<strong><a href="pointer.html">基礎篇-指針</a></strong>》 那一章節：</p>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"unsafe"
+)
+
+func main() {
+	arr := [2][3]int{{1, 2, 3}, {4, 5, 6}}
+	for i := 0; i &lt; 2; i++ {
+		for j := 0; j &lt; 3; j++ {
+			addr := uintptr(unsafe.Pointer(&amp;arr[0][0])) + uintptr(i*3*8) + uintptr(j*8) // 地址
+			fmt.Printf("arr[%d][%d]: 地址 = 0x%x，值 = %d\n", i, j, addr, *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;arr[0][0])) + uintptr(i*3*8) + uintptr(j*8))))
+		}
+	}
+}
+</code></pre>
+<p>上面代碼運行結果如下：</p>
+<pre><code class="language-shell">arr[0][0]: 地址 = 0xc000068ef0，值 = 1
+arr[0][1]: 地址 = 0xc000068ef8，值 = 2
+arr[0][2]: 地址 = 0xc000068f00，值 = 3
+arr[1][0]: 地址 = 0xc000068f08，值 = 4
+arr[1][1]: 地址 = 0xc000068f10，值 = 5
+arr[1][2]: 地址 = 0xc000068f18，值 = 6
+</code></pre>
+<h3 id="空間局部性示例"><a class="header" href="#空間局部性示例">空間局部性示例</a></h3>
+<p>對於數組的訪問，我們可以一行行訪問，也可以一列列訪問，根據上面分析我們可以得出<strong>一行行訪問可以有很好的空間局部性，有更好的執行效率</strong>的結論。因爲一行行訪問時，下一次訪問的就是當前元素挨着的元素，而一列列訪問則是需要跨過數組列數個元素：</p>
+<p><img src="../images/202104/multi_dimen_array.png" alt="二位數組的訪問" /></p>
+<p>最後我們來進行下基準測試驗證一下：</p>
+<pre><code class="language-go">func BenchmarkAccessArrayByRow(b *testing.B) {
+	var myArr [3][5]int
+	b.ReportAllocs()
+	b.ResetTimer()
+	for k := 0; k &lt; b.N; k++ {
+		for i := 0; i &lt; 3; i++ {
+			for j := 0; j &lt; 5; j++ {
+				myArr[i][j] = i*i + j*j
+			}
+		}
+	}
+}
+
+func BenchmarkAccessArrayByCol(b *testing.B) {
+	var myArr [3][5]int
+	b.ReportAllocs()
+	b.ResetTimer()
+	for k := 0; k &lt; b.N; k++ {
+		for i := 0; i &lt; 5; i++ {
+			for j := 0; j &lt; 3; j++ {
+				myArr[j][i] = i*i + j*j
+			}
+		}
+	}
+}
+</code></pre>
+<p>本人電腦中基準測試結果如下：</p>
+<pre><code class="language-shell">goos: linux
+goarch: amd64
+BenchmarkAccessArrayByRow 	121336255	        10.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAccessArrayByCol 	82772149	        13.2 ns/op	       0 B/op	       0 allocs/op
+PASS
+</code></pre>
+<p>從上面結果可以看出來，我們可以發現按行訪問（10.3 ns/op）快於按列訪問（13.2 ns/op），符合我們預測的結論。</p>
+<h2 id="如何實現隨機訪問數組的全部元素"><a class="header" href="#如何實現隨機訪問數組的全部元素">如何實現隨機訪問數組的全部元素？</a></h2>
+<p>這裏將介紹兩種實現方法。這兩種實現方法都是Go語言底層使用到的算法。</p>
+<p>第一種方法用在Go調度器部分。G-M-P調度模型中，當M關聯的P的本地隊列中沒有可以執行的G時候，M會從其他P的本地可運行G隊列中偷取G，所有P存儲一個全局切片中，爲了隨機性選擇P來偷取，這就需要隨機的訪問數組。該算法具體叫什麼，未找到相關文檔。由於該算法實現上使用到素數和取模運算，姑且稱之素數取模隨機法。</p>
+<p>第二種方法使用算法<code>Fisher–Yates shuffle</code>，Go語言用它來隨機性處理通道選擇器select中case語句。</p>
+<h3 id="素數取模隨機法"><a class="header" href="#素數取模隨機法">素數取模隨機法</a></h3>
+<p>該算法實現邏輯是：對於一個數組[n]T，隨機的從小於n的素數集合中，選擇一個素數，假定是p，接着從數組0到n-1位置中隨機選擇一個位置開始，假定是m，那麼此時<code>(m + p)%n = i</code>位置處的數組元素就是我們要訪問的第一個元素。第二次要訪問的元素是<code>(上一次位置+p)%n</code>處元素，這裏面就是<code>(i+p)%n</code>，以此類推，訪問n次就可以訪問完全部數組元素。</p>
+<p>舉個具體例子來說明，比如對於[8]int數組a，其素數集合是{1, 3, 5, 7}。假定選擇的素數是5，從位置1開始。</p>
+<ul>
+<li>第一次訪問元素是 (1 + 5)%8 = 6處元素，即a[6]</li>
+<li>第二次訪問元素是 (6 + 5)%8 = 3處元素，即a[3]</li>
+<li>第三次訪問元素是 (3 + 5)%8 = 0處元素，即a[0]</li>
+<li>第四次訪問元素是 (0 + 5)%8 = 5處元素，即a[5]</li>
+<li>第五次訪問元素是 (5 + 5)%8 = 2處元素，即a[2]</li>
+<li>第六次訪問元素是 (2 + 5)%8 = 7處元素，即a[7]</li>
+<li>第七次訪問元素是 (7 + 5)%8 = 4處元素，即a[4]</li>
+<li>第八次訪問元素是 (4 + 5)%8 = 1處元素，即a[1]</li>
+</ul>
+<p>從上面例子可以看出來訪問8次即可遍歷完所有數組元素，由於素數和開始位置是隨機的，那麼訪問也能做到隨機性。</p>
+<p>該算法實現如下，代碼來自Go源碼 <strong><a href="https://github.com/golang/go/blob/go1.14.13/src/runtime/proc.go#L5403-L5451">runtime/proc.go</a></strong>：</p>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"math/rand"
+)
+
+type randomOrder struct {
+	count    uint32
+	coprimes []uint32
+}
+
+type randomEnum struct {
+	i     uint32
+	count uint32
+	pos   uint32
+	inc   uint32
+}
+
+func (ord *randomOrder) reset(count uint32) {
+	ord.count = count
+	ord.coprimes = ord.coprimes[:0]
+	for i := uint32(1); i &lt;= count; i++ { // 初始化素數集合
+		if gcd(i, count) == 1 {
+			ord.coprimes = append(ord.coprimes, i)
+		}
+	}
+}
+
+func (ord *randomOrder) start(i uint32) randomEnum {
+	return randomEnum{
+		count: ord.count,
+		pos:   i % ord.count,
+		inc:   ord.coprimes[i%uint32(len(ord.coprimes))],
+	}
+}
+
+func (enum *randomEnum) done() bool {
+	return enum.i == enum.count
+}
+
+func (enum *randomEnum) next() {
+	enum.i++
+	enum.pos = (enum.pos + enum.inc) % enum.count
+}
+
+func (enum *randomEnum) position() uint32 {
+	return enum.pos
+}
+
+func gcd(a, b uint32) uint32 { // 輾轉相除法取最大公約數
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func main() {
+	arr := [8]int{1, 2, 3, 4, 5, 6, 7, 8}
+	var order randomOrder
+	order.reset(uint32(len(arr)))
+
+	fmt.Println("====第一次隨機遍歷====")
+	for enum := order.start(rand.Uint32()); !enum.done(); enum.next() {
+		fmt.Println(arr[enum.position()])
+	}
+
+	fmt.Println("====第二次隨機遍歷====")
+	for enum := order.start(rand.Uint32()); !enum.done(); enum.next() {
+		fmt.Println(arr[enum.position()])
+	}
+}
+</code></pre>
+<h3 id="fisheryates-shuffle"><a class="header" href="#fisheryates-shuffle">Fisher–Yates shuffle</a></h3>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Locality_of_reference">Locality of reference</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm">Fisher–Yates_shuffle</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../type/string.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../type/slice.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../type/string.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../type/slice.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

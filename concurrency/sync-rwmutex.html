@@ -1,0 +1,434 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>讀寫鎖 - sync.RWMutex - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="讀寫鎖---syncrwmutex"><a class="header" href="#讀寫鎖---syncrwmutex">讀寫鎖 - sync.RWMutex</a></h1>
+<p>RWMutex是Go語言中內置的一個reader/writer鎖，用來解決讀者-寫者問題（Readers–writers problem）。在任意一時刻，一個RWMutex只能由任意數量的reader持有，或者只能由一個writer持有。</p>
+<h2 id="讀者-寫者問題"><a class="header" href="#讀者-寫者問題">讀者-寫者問題</a></h2>
+<p>讀者-寫者問題（Readers–writers problem）描述了計算機併發處理讀寫數據遇到的問題，如何保證數據完整性、一致性。解決讀者-寫者問題需保證對於一份資源操作滿足以下下條件：</p>
+<ul>
+<li>讀寫互斥</li>
+<li>寫寫互斥</li>
+<li>允許多個讀者同時讀取</li>
+</ul>
+<p>解決讀者-寫者問題，可以採用<code>讀者優先（readers-preference）</code>方案或者<code>寫者優先（writers-preference）</code>方案。</p>
+<ul>
+<li>
+<p><strong>讀者優先（readers-preference）</strong>：讀者優先是讀操作優先於寫操作，即使寫操作提出申請資源，但只要還有讀者在讀取操作，就還允許其他讀者繼續讀取操作，直到所有讀者結束讀取，纔開始寫。讀優先可以提供很高的併發處理性能，但是在頻繁讀取的系統中，會長時間寫阻塞，導致寫飢餓。</p>
+</li>
+<li>
+<p><strong>寫者優先（writers-preference）</strong>：寫者優先是寫操作優先於讀操作，如果有寫者提出申請資源，在申請之前已經開始讀取操作的可以繼續執行讀取，但是如果再有讀者申請讀取操作，則不能夠讀取，只有在所有的寫者寫完之後纔可以讀取。寫者優先解決了讀者優先造成寫飢餓的問題。但是若在頻繁寫入的系統中，會長時間讀阻塞，導致讀飢餓。</p>
+</li>
+</ul>
+<p>RWMutex設計採用寫者優先方法，保證寫操作優先處理。</p>
+<h2 id="源碼分析"><a class="header" href="#源碼分析">源碼分析</a></h2>
+<p>下面分析的源碼進行精簡處理，去掉了race檢查功能的代碼。</p>
+<h3 id="rwmutex的定義"><a class="header" href="#rwmutex的定義">RWMutex的定義</a></h3>
+<pre><code class="language-go">type RWMutex struct {
+	w           Mutex  // 互斥鎖
+	writerSem   uint32 // writers信號量
+	readerSem   uint32 // readers信號量
+	readerCount int32  // reader數量
+	readerWait  int32  // writer申請鎖時候，已經申請到鎖的reader的數量
+}
+
+const rwmutexMaxReaders = 1 &lt;&lt; 30 // 最大reader數，用於反轉readerCount
+</code></pre>
+<h3 id="rlockrunlock的實現"><a class="header" href="#rlockrunlock的實現">RLock/RUnlock的實現</a></h3>
+<pre><code class="language-go">func (rw *RWMutex) RLock() {
+	if atomic.AddInt32(&amp;rw.readerCount, 1) &lt; 0 { // 如果rw.readerCount爲負數，說明此時已有一個writer持有鎖或者正在申請鎖。
+		runtime_SemacquireMutex(&amp;rw.readerSem, false, 0) // 此時reader休眠阻塞在readerSem信號上，等待喚醒
+	}
+}
+
+func (rw *RWMutex) RUnlock() {
+	if r := atomic.AddInt32(&amp;rw.readerCount, -1); r &lt; 0 { // r小於0說明此時有等待請求鎖的writer
+		rw.rUnlockSlow(r)
+	}
+}
+
+func (rw *RWMutex) rUnlockSlow(r int32) {
+	if r+1 == 0 || r+1 == -rwmutexMaxReaders { // RLock之前已經進行了RUnlock操作
+		throw("sync: RUnlock of unlocked RWMutex")
+	}
+
+	if atomic.AddInt32(&amp;rw.readerWait, -1) == 0 { // 此時是最後一個獲取到鎖的reader進行RUnlock操作，那麼釋放writerSem信號，喚醒等待的writer來獲取鎖。
+		runtime_Semrelease(&amp;rw.writerSem, false, 1)
+	}
+}
+</code></pre>
+<h3 id="lockunlock的實現"><a class="header" href="#lockunlock的實現">Lock/Unlock的實現</a></h3>
+<pre><code class="language-go">func (rw *RWMutex) Lock() {
+	rw.w.Lock() // 加互斥鎖，阻塞其他writer進行Lock操作，保證寫-寫互斥。
+
+	// 將rw.readerCount 更改爲rw.readerCount - rwmutexMaxReaders，
+	// 此時rw.readerCount由一個正數轉變成一個負數，這種方式既能保持記錄reader數量，又能表明有writer正在請求鎖
+	r := atomic.AddInt32(&amp;rw.readerCount, -rwmutexMaxReaders) + rwmutexMaxReaders
+
+	if r != 0 &amp;&amp; atomic.AddInt32(&amp;rw.readerWait, r) != 0 { // r!=0表明此時有reader持有鎖，則當前writer只能阻塞等待，但爲了保證寫優先，需要readerWait記錄當前已獲取到鎖的讀者數量
+		runtime_SemacquireMutex(&amp;rw.writerSem, false, 0)
+	}
+}
+
+func (rw *RWMutex) Unlock() {
+	r := atomic.AddInt32(&amp;rw.readerCount, rwmutexMaxReaders)
+	if r &gt;= rwmutexMaxReaders { // Lock之前先進行了Unlock操作
+		throw("sync: Unlock of unlocked RWMutex")
+	}
+
+	for i := 0; i &lt; int(r); i++ { // 釋放信號，喚醒阻塞的reader們
+		runtime_Semrelease(&amp;rw.readerSem, false, 0)
+	}
+	rw.w.Unlock() // 是否互鎖鎖，允許其他writer進行獲取鎖操作了
+}
+</code></pre>
+<p>對於<code>讀者優先（readers-preference）</code>的讀寫鎖，只需要一個<code>readerCount</code>記錄所有讀者，就可以輕易實現。Go中的RWMutex實現的是<code>寫者優先（writers-preference）</code>的讀寫鎖，那就需要用到<code>readerWait</code>來記錄寫者申請鎖時候，已經獲取到鎖的讀者數量。</p>
+<p>這樣當後續有其他讀者繼續申請鎖時候，可以讀取<code>readerWait</code>是否大於0，大於0則說明有寫者已經申請鎖了，按照<code>寫者優先（writers-preference）</code>原則，該讀者需要排到寫者之後，但是我們還需要記錄這些排在寫者後面讀者的數量呀，畢竟寫着將來釋放鎖的時候，還得喚醒一個個這些讀者。這種情況下既要讀取<code>readerWait</code>，又要更新排隊的讀者數量，這是兩個操作，無法原子化。RWMutex在實現時候，通過將readerCount轉換成負數，一方面表明有寫者申請了鎖，另一方面readerCount還可以繼續記錄排隊的讀者數量，解決剛描述的無法原子化的問題，真是巧妙！</p>
+<p>對於<code>讀者優先（readers-preference）</code>的讀寫鎖，我們可以藉助Mutex實現。示例代碼如下：</p>
+<pre><code class="language-go">type rwlock struct {
+	reader_cnt  int
+	reader_lock sync.Mutex
+	writer_lock sync.Mutex
+}
+
+func NewRWLock() *rwlock {
+	return &amp;rwlock{}
+}
+
+func (l *rwlock) RLock() {
+	l.reader_lock.Lock()
+	defer l.reader_lock.Unlock()
+	l.reader_cnt++
+	if l.reader_cnt == 1 { // first reader
+		l.writer_lock.Lock()
+	}
+}
+
+func (l *rwlock) RUnlock() {
+	l.reader_lock.Lock()
+	defer l.reader_lock.Unlock()
+	l.reader_cnt--
+	if l.reader_cnt == 0 { // latest reader
+		l.writer_lock.Unlock()
+	}
+}
+
+func (l *rwlock) Lock() {
+	l.writer_lock.Lock()
+}
+
+func (l *rwlock) Unlock() {
+	l.writer_lock.Unlock()
+}
+</code></pre>
+<p>上面示例代碼中，儘管讀者操作的實現上用到互斥鎖，但由於它是用完立馬就是釋放掉，性能不會差太多。</p>
+<h2 id="三大錯誤使用場景"><a class="header" href="#三大錯誤使用場景">三大錯誤使用場景</a></h2>
+<h3 id="rlockrunlocklockunlock未成對出現"><a class="header" href="#rlockrunlocklockunlock未成對出現">RLock/RUnlock、Lock/Unlock未成對出現</a></h3>
+<p>同互斥鎖一樣，sync.RWMutex的RLock/RUnlock，以及Lock/Unlock總是成對出現的。Lock或RLock多餘調用會導致鎖沒有釋放，可能出現死鎖，Unlock或RUnlock多餘的調用會大導致panic.</p>
+<pre><code class="language-go">func main() {
+	var l sync.RWMutex
+	l.Lock()
+	l.Unlock()
+	l.Unlock() // fatal error: sync: Unlock of unlocked RWMutex
+}
+</code></pre>
+<p>對於Lock/Unlock未成對出現所有可能情況如下：</p>
+<ul>
+<li>
+<p>如果只有Lock情況</p>
+<p>如果有一個 goroutine 只執行 Lock 操作而不執行 Unlock 操作，那麼其他的 goroutine 就會一直被阻塞（拿不到鎖），隨着越來越多的阻塞的 goroutine 越來越多，整個系統最終會崩潰。</p>
+</li>
+<li>
+<p>如果只有Unlock情況</p>
+<ul>
+<li>如果其他 goroutine 持有鎖，鎖將被釋放。</li>
+<li>如果鎖處於空閒狀態（unoccupied state），它會panic。</li>
+</ul>
+</li>
+</ul>
+<h3 id="複製syncrwmutex作爲函數值傳遞"><a class="header" href="#複製syncrwmutex作爲函數值傳遞">複製sync.RWMutex作爲函數值傳遞</a></h3>
+<p>同Mutex一樣，RWMutex也是不能複製使用的，考慮下面場景代碼：</p>
+<pre><code class="language-go">func main() {
+	var l sync.RWMutex
+	l.Lock()
+	foo(l)
+	l.Lock()
+	l.Unlock()
+}
+
+func foo(l sync.RWMutex) {
+	l.Unlock()
+}
+</code></pre>
+<p>上面場景代碼中本意先使用l.Lock()進行上鎖操作，然後調用foo(l)釋放該鎖，最後再次上鎖和釋放鎖。但這種操作是錯誤的，會導致死鎖。foo()函數接收的參數是變量l的一個副本，該副本把之前l變量的鎖狀態（鎖狀態指的是writerSem，readerCount等字段信息）也複製了一遍，此時副本的鎖狀態是上鎖狀態的，所以foo函數中是可以進行釋放鎖操作的，但釋放的並不是最開始的那個鎖。</p>
+<p>我們可以使用<code>go vet</code>命令檢測複製鎖情況：</p>
+<pre><code class="language-bash">vagrant@vagrant:~$ go vet main.go
+# command-line-arguments
+./main.go:8:6: call of foo copies lock value: sync.RWMutex
+./main.go:13:12: foo passes lock by value: sync.RWMutex
+</code></pre>
+<p>解決上面問題可以使用指針傳遞:</p>
+<pre><code class="language-go">func foo(l *sync.RWMutex) {
+	l.Unlock()
+}
+</code></pre>
+<h3 id="不可重入導致死鎖"><a class="header" href="#不可重入導致死鎖">不可重入導致死鎖</a></h3>
+<p>可重入鎖(ReentrantLock)指的一個線程中可以多次獲取同一把鎖，換到Go語言場景就是一個Goroutine中，Mutex和RWMutex可以連續Lock操作，而不會導致死鎖。同互斥體Mutex一樣，RWMutex也是不可重入鎖，不支持重入。</p>
+<pre><code class="language-go">func main() {
+	var l sync.RWMutex
+	l.Lock()
+	foo(&amp;l) // foo中嘗試重入鎖，會導致死鎖
+	l.Unlock()
+}
+
+func foo(l *sync.RWMutex) {
+	l.Lock()
+	l.Unlock()
+}
+</code></pre>
+<p>下面是讀鎖和寫鎖重入時候導致的死鎖：</p>
+<pre><code class="language-go">func main() {
+	var l sync.RWMutex
+	l.RLock()
+	foo(&amp;l)
+	l.RUnlock()
+}
+
+func foo(l *sync.RWMutex) {
+	l.Lock()
+	l.Unlock()
+}
+</code></pre>
+<p>上面代碼中寫鎖重入時候，需要讀鎖先釋放，而讀鎖釋放又依賴寫鎖，這樣就形成了死循環，導致死鎖。</p>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Readers%E2%80%93writers_problem">Readers–writers problem</a></li>
+<li><a href="https://medium.com/golangspec/sync-rwmutex-ca6c6c3208a0">sync.RWMutex: Solving readers-writers problems</a></li>
+<li><a href="https://cloudolife.com/2020/04/18/Programming-Language/Golang-Go/Synchronization/Use-sync-Mutex-sync-RWMutex-to-lock-share-data-for-race-condition/">Use sync.Mutex, sync.RWMutex to lock share data for race condition</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../concurrency/sync-mutex.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../gmp/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../concurrency/sync-mutex.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../gmp/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

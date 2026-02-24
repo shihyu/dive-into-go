@@ -1,0 +1,502 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>編譯流程 - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="編譯流程"><a class="header" href="#編譯流程">編譯流程</a></h1>
+<p>Go語言是一門靜態編譯型語言，源代碼需要通過編譯器轉換成目標平臺的機器碼才能運行。本文將介紹編譯器的編譯流程，包括編譯器的六個階段、Go編譯器的自舉機制以及源碼編譯的相關知識，幫助讀者理解Go語言的編譯流程。</p>
+<h2 id="編譯的六階段"><a class="header" href="#編譯的六階段">編譯的六階段</a></h2>
+<p>編譯器的核心任務是<strong>將高級語言（high-level language）轉換爲目標平臺的機器碼（machine code）</strong>。編譯器的整個編譯流程可分爲兩部分：分析部分（Analysis part）以及合成部分（Synthesis part）。這兩部分也稱爲<strong>編譯前端</strong>和<strong>編譯後端</strong>。每部分又可以細分爲三個階段，簡單來說整個編譯流程大致可細分爲六個階段：</p>
+<ul>
+<li>詞法分析（Lexical analysis）<sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup></li>
+<li>語法分析（Syntax analysis）<sup class="footnote-reference" id="fr-2-1"><a href="#footnote-2">2</a></sup></li>
+<li>語義分析（Semantic analysis）</li>
+<li>中間碼生成（Intermediate code generator）</li>
+<li>代碼優化（Code optimizer）</li>
+<li>機器代碼生成（Code generator）</li>
+</ul>
+<h3 id="詞法分析"><a class="header" href="#詞法分析">詞法分析</a></h3>
+<p>詞法分析是編譯的第一步，編譯器掃描源代碼，從左到右逐行將字符序列分組，生成<strong>詞法單元（Tokens）</strong>。這些詞法單元包括標識符（identifier）、關鍵字（reserved word）、運算符（operator）和常量（constant）等。例如，對於代碼 <code>c = a + b * 5</code>，詞法分析會生成以下Tokens：</p>
+<div class="table-wrapper"><table><thead><tr><th>Lexemes</th><th>Tokens</th></tr></thead><tbody>
+<tr><td>c</td><td>標誌符</td></tr>
+<tr><td>=</td><td>賦值符號</td></tr>
+<tr><td>a</td><td>標誌符</td></tr>
+<tr><td>+</td><td>加法符號</td></tr>
+<tr><td>b</td><td>標誌符</td></tr>
+<tr><td>*</td><td>乘法符號</td></tr>
+<tr><td>5</td><td>數字</td></tr>
+</tbody></table>
+</div>
+<h3 id="語法分析"><a class="header" href="#語法分析">語法分析</a></h3>
+<p>詞法分析階段接收詞法分析階段生成的Tokens序列，然後基於特定編程語言的規則生成抽象語法樹。</p>
+<h4 id="抽象語法樹"><a class="header" href="#抽象語法樹">抽象語法樹</a></h4>
+<p>抽象語法樹（Abstract Syntax Tree），簡稱AST，是源代碼語法結構的一種抽象表示。它以樹狀的形式表現編程語言的語法結構，樹上的每個節點都表示源代碼中的一種結構。以<code>(a+b)*c</code>爲例，最終生成的抽象語法樹如下：</p>
+<p><img src="images/202104/ast.png" alt="" /></p>
+<h3 id="語義分析"><a class="header" href="#語義分析">語義分析</a></h3>
+<p>語義分析階段用來檢查代碼的語義一致性。它使用前一階段的語法樹以及符號表來驗證給定的源代碼在語義上是一致的。它還檢查代碼是否傳達了適當的含義。例如語義分析會檢查<code>a+b</code>中的<code>a</code>和<code>b</code>是否爲可以進行<code>+</code>操作的類型。</p>
+<p>在Go語言中，語義分析會檢查接口實現、類型推導（如 := 短變量聲明）以及包級作用域的符號解析。例如，Go編譯器會確保 <code>var x int; x = "string" </code>這樣的代碼被標記爲類型錯誤。</p>
+<h3 id="中間碼生成"><a class="header" href="#中間碼生成">中間碼生成</a></h3>
+<p>中間碼是一種介於高級語言和機器碼之間的表示形式，具有跨平臺特性。。使用中間碼易於跨平臺轉換爲特定類型目標機器代碼。</p>
+<p>Go編譯器會生成一種平臺無關的中間表示（IR），便於後續優化和目標代碼生成。Go編輯器使用的是一種名爲SSA(Static Single Assignment)的中間表示形式。SSA的每個變量只被賦值一次，便於優化器進行常量傳播，死代碼消除等操作。</p>
+<h3 id="代碼優化"><a class="header" href="#代碼優化">代碼優化</a></h3>
+<p>代碼優化階段主要是改進中間代碼，生成更高效的代碼，優化包括但不限於：</p>
+<ul>
+<li>刪除冗餘代碼（死代碼消除）</li>
+<li>常量摺疊</li>
+<li>-通過循環展開來進行循環優化</li>
+<li>內聯函數</li>
+<li>邊界檢查消除（BCE, Bound Check Elimination）</li>
+</ul>
+<p>Go編譯器在優化階段執行<strong>逃逸分析（Escape Analysis）</strong>，確定變量是否需要分配到堆上，從而減少內存分配開銷。此外，Go還會進行內聯優化，將短小的函數直接嵌入調用處，減少函數調用開銷。</p>
+<h3 id="機器碼生成"><a class="header" href="#機器碼生成">機器碼生成</a></h3>
+<p>機器碼生成是編譯器工作的最後階段。此階段會基於中間碼生成彙編代碼，彙編器根據彙編代碼生成目標文件，目標文件經過鏈接器處理最終生成可執行文件。</p>
+<p>Go編譯器使用 <code>Plan9</code> 彙編作爲統一彙編語言，屏蔽了不同架構的細節，生成的彙編代碼隨後通過彙編器（如 <code>go tool asm</code>）和鏈接器（如 <code>go tool link</code>）轉換爲可執行文件。</p>
+<h2 id="go-編譯流程"><a class="header" href="#go-編譯流程">Go 編譯流程</a></h2>
+<p>上面介紹了通用編譯器工作的整個流程，Go語言編譯器整體遵循這個流程：</p>
+<p><img src="images/202104/go-compile.png" alt="Go語言編譯流程" /></p>
+<p>Go 編譯器在編譯的具體實現時候， 在六個階段基礎上進一步細化。根據Go官方博客介紹<sup class="footnote-reference" id="fr-3-1"><a href="#footnote-3">3</a></sup>，Go編譯具體實現包括下面八個階段：</p>
+<div class="table-wrapper"><table><thead><tr><th>階段名稱</th><th>主要功能</th><th>相關包</th></tr></thead><tbody>
+<tr><td>解析</td><td>詞法分析和語法分析，構建語法樹，包含位置信息用於錯誤和調試。</td><td>cmd/compile/internal/syntax</td></tr>
+<tr><td>類型檢查</td><td>使用語法樹的AST進行類型檢查，基於go/types的端口。</td><td>cmd/compile/internal/types2</td></tr>
+<tr><td>IR構建（Noding）</td><td>將語法和類型轉換爲IR和類型，使用統一IR支持導入/導出和內聯。</td><td>cmd/compile/internal/types, cmd/compile/internal/ir, cmd/compile/internal/noder</td></tr>
+<tr><td>中端優化</td><td>包括死代碼消除、去虛擬化、內聯和逃逸分析等優化。</td><td>cmd/compile/internal/inline, cmd/compile/internal/devirtualize, cmd/compile/internal/escape</td></tr>
+<tr><td>遍歷（Walk）</td><td>分解複雜語句，引入臨時變量，簡化構造（如將switch轉換爲跳轉表）。</td><td>cmd/compile/internal/walk</td></tr>
+<tr><td>通用SSA</td><td>將IR轉換爲SSA形式，應用內建函數，執行機器無關的優化（如死代碼消除）。</td><td>cmd/compile/internal/ssa, cmd/compile/internal/ssagen</td></tr>
+<tr><td>生成機器碼</td><td>將SSA降低爲機器特定代碼，優化（如寄存器分配），生成包含反射和調試數據的目標文件。</td><td>cmd/compile/internal/ssa, cmd/internal/obj</td></tr>
+<tr><td>導出</td><td>寫入導出數據文件，包括類型信息、IR和逃逸分析摘要。</td><td></td></tr>
+</tbody></table>
+</div>
+<p>我們執行<code>go build</code>命令時候，帶上<code>-n</code>選項可以觀察編譯流程所執行所有的命令：</p>
+<pre><code class="language-shell">#
+# command-line-arguments
+#
+
+mkdir -p $WORK/b001/
+cat &gt;$WORK/b001/importcfg &lt;&lt; 'EOF' # internal
+# import config
+packagefile runtime=/usr/lib/go/pkg/linux_amd64/runtime.a
+EOF
+cd /home/vagrant/dive-into-go
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath "$WORK/b001=&gt;" -p main -complete -buildid aJhlsTb17ElgWQeF76b5/aJhlsTb17ElgWQeF76b5 -goversion go1.14.13 -D _/home/vagrant/dive-into-go -importcfg $WORK/b001/importcfg -pack ./empty_string.go
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/_pkg_.a # internal
+cat &gt;$WORK/b001/importcfg.link &lt;&lt; 'EOF' # internal
+packagefile command-line-arguments=$WORK/b001/_pkg_.a
+packagefile runtime=/usr/lib/go/pkg/linux_amd64/runtime.a
+packagefile internal/bytealg=/usr/lib/go/pkg/linux_amd64/internal/bytealg.a
+packagefile internal/cpu=/usr/lib/go/pkg/linux_amd64/internal/cpu.a
+packagefile runtime/internal/atomic=/usr/lib/go/pkg/linux_amd64/runtime/internal/atomic.a
+packagefile runtime/internal/math=/usr/lib/go/pkg/linux_amd64/runtime/internal/math.a
+packagefile runtime/internal/sys=/usr/lib/go/pkg/linux_amd64/runtime/internal/sys.a
+EOF
+mkdir -p $WORK/b001/exe/
+cd .
+/usr/lib/go/pkg/tool/linux_amd64/link -o $WORK/b001/exe/a.out -importcfg $WORK/b001/importcfg.link -buildmode=exe -buildid=FoylCipvV-SPkhyi2PJs/aJhlsTb17ElgWQeF76b5/aJhlsTb17ElgWQeF76b5/FoylCipvV-SPkhyi2PJs -extld=gcc $WORK/b001/_pkg_.a
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out # internal
+mv $WORK/b001/exe/a.out empty_string
+
+</code></pre>
+<p>從上面命令輸出的內容可以看到：</p>
+<ol>
+<li>
+<p>Go編譯器首先會創建一個任務輸出臨時目錄（<code>mkdir -p $WORK/b001/</code>）。b001是root task的工作目錄，每次構建都是由一系列task完成，它們構成 <strong><a href="https://github.com/golang/go/blob/master/src/cmd/go/internal/work/action.go">action graph</a></strong></p>
+</li>
+<li>
+<p>接着將<code>empty_string.go</code>中依賴的包: <code>/usr/lib/go/pkg/linux_amd64/runtime.a</code> 寫入到<code>importcfg</code>中</p>
+</li>
+<li>
+<p>接着會使用<code>compile</code>命令，並指定<code>importcfg</code>文件，將主程序<code>empty_string.go</code>編譯成<code>_pkg.a</code>文件（<code>/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath "$WORK/b001=&gt;" -p main -complete -buildid aJhlsTb17ElgWQeF76b5/aJhlsTb17ElgWQeF76b5 -goversion go1.14.13 -D _/home/vagrant/dive-into-go -importcfg $WORK/b001/importcfg -pack ./empty_string.go</code>）。</p>
+</li>
+<li>
+<p>程序依賴的包都寫到<code>importcfg.link</code>這個文件中，Go編譯器連接階段中鏈接器會使用該文件，找到所有依賴的包文件，將其連接到程序中（<code>/usr/lib/go/pkg/tool/linux_amd64/link -o $WORK/b001/exe/a.out -importcfg $WORK/b001/importcfg.link -buildmode=exe -buildid=FoylCipvV-SPkhyi2PJs/aJhlsTb17ElgWQeF76b5/aJhlsTb17ElgWQeF76b5/FoylCipvV-SPkhyi2PJs -extld=gcc $WORK/b001/_pkg_.a</code>）。接着會將<code>buildid</code>寫入二進制文件中（
+<code>/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out</code>）。</p>
+</li>
+<li>
+<p>將編譯成功的二進制文件移動到輸出目錄中（<code>mv $WORK/b001/exe/a.out empty_string</code>）。</p>
+</li>
+</ol>
+<p>上面4中我們可以看到<code>buildid</code>寫入過程。在 Go 的構建過程中，<code>buildid</code> 用於緩存管理。Go 的構建系統會根據<code>buildid</code>來判斷是否需要重新構建某個包或模塊。如果緩存中已經存在具有相同<code>buildid</code>的構建結果，構建系統可以重用緩存，從而加快構建速度。<code>buildid</code>也可用於唯一標識每次構建的二進制文件。我們可以通過下面命令查看二進制文件的<code>buildid</code>：</p>
+<pre><code class="language-bash">go tool buildid ./example_binary
+</code></pre>
+<h3 id="完整編譯流程輸出"><a class="header" href="#完整編譯流程輸出">完整編譯流程輸出</a></h3>
+<p>爲了詳細查看<code>go build</code>整個詳細過程，我們可以使用<code>go build -work -a -p 1 -x empty_string.go</code>命令來觀察整個過程，它比<code>go build -n</code>提供了更詳細的信息:</p>
+<ul>
+<li>-work選項指示編譯器編譯完成後保留編譯臨時工作目錄</li>
+<li>-a選項強制編譯所有包。我們使用<code>go build -n</code>時候，只看到main包編譯過程，這是因爲其他包已經編譯過了，不會再編譯。我們可以使用這個選項強制編譯所有包。</li>
+<li>-p選項用來指定編譯過程中線程數，這裏指定爲1，是爲觀察編譯的順序性</li>
+<li>-x選項可以指定編譯參數</li>
+</ul>
+<p>完整編譯輸出內容摘要如下：</p>
+<pre><code class="language-bash">vagrant@vagrant:~/dive-into-go$ go build -work -a -p 1 -x empty_string.go
+WORK=/tmp/go-build871888098
+mkdir -p $WORK/b004/
+cat &gt;$WORK/b004/go_asm.h &lt;&lt; 'EOF' # internal
+EOF
+cd /usr/lib/go/src/internal/cpu
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b004=&gt;" -I $WORK/b004/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -gensymabis -o $WORK/b004/symabis ./cpu_x86.s
+cat &gt;$WORK/b004/importcfg &lt;&lt; 'EOF' # internal
+# import config
+EOF
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b004/_pkg_.a -trimpath "$WORK/b004=&gt;" -p internal/cpu -std -+ -buildid 8F_1bll3rU7d1mo74DFt/8F_1bll3rU7d1mo74DFt -goversion go1.14.13 -symabis $WORK/b004/symabis -D "" -importcfg $WORK/b004/importcfg -pack -asmhdr $WORK/b004/go_asm.h ./cpu.go ./cpu_amd64.go ./cpu_x86.go
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b004=&gt;" -I $WORK/b004/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b004/cpu_x86.o ./cpu_x86.s
+/usr/lib/go/pkg/tool/linux_amd64/pack r $WORK/b004/_pkg_.a $WORK/b004/cpu_x86.o # internal
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b004/_pkg_.a # internal
+cp $WORK/b004/_pkg_.a /home/vagrant/.cache/go-build/e2/e20b6a590621cff911735ea491492b992b429df9b0b579155aecbfdffdf7ec74-d # internal
+mkdir -p $WORK/b003/
+cat &gt;$WORK/b003/go_asm.h &lt;&lt; 'EOF' # internal
+EOF
+cd /usr/lib/go/src/internal/bytealg
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -gensymabis -o $WORK/b003/symabis ./compare_amd64.s ./count_amd64.s ./equal_amd64.s ./index_amd64.s ./indexbyte_amd64.s
+cat &gt;$WORK/b003/importcfg &lt;&lt; 'EOF' # internal
+# import config
+packagefile internal/cpu=$WORK/b004/_pkg_.a
+EOF
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b003/_pkg_.a -trimpath "$WORK/b003=&gt;" -p internal/bytealg -std -+ -buildid I0-Z7SEGCaTIz2BZXZCm/I0-Z7SEGCaTIz2BZXZCm -goversion go1.14.13 -symabis $WORK/b003/symabis -D "" -importcfg $WORK/b003/importcfg -pack -asmhdr $WORK/b003/go_asm.h ./bytealg.go ./compare_native.go ./count_native.go ./equal_generic.go ./equal_native.go ./index_amd64.go ./index_native.go ./indexbyte_native.go
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b003/compare_amd64.o ./compare_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b003/count_amd64.o ./count_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b003/equal_amd64.o ./equal_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b003/index_amd64.o ./index_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b003=&gt;" -I $WORK/b003/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b003/indexbyte_amd64.o ./indexbyte_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/pack r $WORK/b003/_pkg_.a $WORK/b003/compare_amd64.o $WORK/b003/count_amd64.o $WORK/b003/equal_amd64.o $WORK/b003/index_amd64.o $WORK/b003/indexbyte_amd64.o # internal
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b003/_pkg_.a # internal
+cp $WORK/b003/_pkg_.a /home/vagrant/.cache/go-build/42/42c362e050cb454a893b15620b72fbb75879ac0a1fdd13762323eec247798a43-d # internal
+mkdir -p $WORK/b006/
+cat &gt;$WORK/b006/go_asm.h &lt;&lt; 'EOF' # internal
+EOF
+cd /usr/lib/go/src/runtime/internal/atomic
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b006=&gt;" -I $WORK/b006/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -gensymabis -o $WORK/b006/symabis ./asm_amd64.s
+cat &gt;$WORK/b006/importcfg &lt;&lt; 'EOF' # internal
+# import config
+EOF
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b006/_pkg_.a -trimpath "$WORK/b006=&gt;" -p runtime/internal/atomic -std -+ -buildid uI0THQvFtr7yRsGPOXDw/uI0THQvFtr7yRsGPOXDw -goversion go1.14.13 -symabis $WORK/b006/symabis -D "" -importcfg $WORK/b006/importcfg -pack -asmhdr $WORK/b006/go_asm.h ./atomic_amd64.go ./stubs.go
+/usr/lib/go/pkg/tool/linux_amd64/asm -trimpath "$WORK/b006=&gt;" -I $WORK/b006/ -I /usr/lib/go/pkg/include -D GOOS_linux -D GOARCH_amd64 -o $WORK/b006/asm_amd64.o ./asm_amd64.s
+/usr/lib/go/pkg/tool/linux_amd64/pack r $WORK/b006/_pkg_.a $WORK/b006/asm_amd64.o # internal
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b006/_pkg_.a # internal
+cp $WORK/b006/_pkg_.a /home/vagrant/.cache/go-build/6b/6b2c5449e17d9b0e34bfe37a77dc16b9675ffb657fbe9277a1067fa8ca5179ab-d # internal
+mkdir -p $WORK/b008/
+cat &gt;$WORK/b008/importcfg &lt;&lt; 'EOF' # internal
+# import config
+EOF
+cd /usr/lib/go/src/runtime/internal/sys
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b008/_pkg_.a -trimpath "$WORK/b008=&gt;" -p runtime/internal/sys -std -+ -complete -buildid AZJ761JYi_ToDiYI_5UA/AZJ761JYi_ToDiYI_5UA -goversion go1.14.13 -D "" -importcfg $WORK/b008/importcfg -pack ./arch.go ./arch_amd64.go ./intrinsics.go ./intrinsics_common.go ./stubs.go ./sys.go ./zgoarch_amd64.go ./zgoos_linux.go ./zversion.go
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b008/_pkg_.a # internal
+cp $WORK/b008/_pkg_.a /home/vagrant/.cache/go-build/f7/f706a1321f01a45857a441e80fd50709a700a9d304543d534a953827021222c1-d # internal
+mkdir -p $WORK/b007/
+cat &gt;$WORK/b007/importcfg &lt;&lt; 'EOF' # internal
+# import config
+packagefile runtime/internal/sys=$WORK/b008/_pkg_.a
+EOF
+cd /usr/lib/go/src/runtime/internal/math
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b007/_pkg_.a -trimpath "$WORK/b007=&gt;" -p runtime/internal/math -std -+ -complete -buildid NxqylyDav-hCzDju1Kr1/NxqylyDav-hCzDju1Kr1 -goversion go1.14.13 -D "" -importcfg $WORK/b007/importcfg -pack ./math.go
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b007/_pkg_.a # internal
+cp $WORK/b007/_pkg_.a /home/vagrant/.cache/go-build/f6/f6dcba7ea64d64182a26bcda498c1888786213b0b5560d9bde92cfff323be7df-d # internal
+...
+</code></pre>
+<p>從上面可以看到編譯器工作目錄是<code>/tmp/go-build871888098</code>，cd進去之後，我們可以看到多個子目錄，每個子目錄都是用編譯子task使用，存放的都是編譯後的包：</p>
+<pre><code class="language-bash">vagrant@vagrant:/tmp/go-build871888098$ ls
+b001  b002  b003  b004  b006  b007  b008
+</code></pre>
+<p>其中<code>b001</code>目錄用於main包編譯，是任務圖的root節點。<code>b001</code>目錄下面的<code>importcfg.link</code>文件存放都是程序所有依賴的包地址，它們指向的都是b002,b003...這些目錄下的<code>_pkg_.a</code>文件。</p>
+<h2 id="go-編譯器"><a class="header" href="#go-編譯器">Go 編譯器</a></h2>
+<p>Go 編譯器，英文名稱是<code>Go compiler</code>，簡稱gc。gc是Go命令的一部分，包含在每次Go發行版本中。Go命令是由Go語言編寫的，而Go語言編寫的程序需要Go命令來編譯，也就是自己編譯自己，這就出現了“先有雞還是先有蛋”的問題。Go gc如何做到自己編譯自己呢，要解答這個問題，我們先來瞭解下自舉概念。</p>
+<h3 id="自舉"><a class="header" href="#自舉">自舉</a></h3>
+<p>自舉，英文名稱是Bootstrapping，這個詞來自自西方的一句諺語：“pull oneself up by one's bootstraps”，字面意思就是“拽着鞋帶把自己拉起來”。自舉一詞在編譯器領域指的是用待編譯的程序的編程語言來編寫其編譯器。自舉步驟一般如下，假定要編譯的程序語言是A：</p>
+<ol>
+<li>先使用程序語言B實現A的編譯器，假定爲compiler0</li>
+<li>接着使用A語言實現A的編譯器，之後使用步驟1中的compiler0編譯器編譯，得到編譯器compiler1</li>
+<li>最後我們就可以使用compiler1來編譯A語言寫的程序，這樣實現了自己編譯自己</li>
+</ol>
+<p>通過自舉方式，解決了上面說的“先有雞還是先有蛋”的問題，實現了自己編譯自己。</p>
+<p>Go語言最開始是使用C語言實現的編譯器，go1.4是最後一個C語言實現的編譯器版本。自go1.5開始，Go實現了自舉功能，go1.5的gc是由go語言實現的，它是由go1.4版本的C語言實現編譯器編譯出來的，詳細內容可以參見Go 自舉的設計文檔：<a href="https://docs.google.com/document/d/1P3BLR31VA8cvLJLfMibSuTdwTuF7WWLux71CYD0eeD8/edit">Go 1.3+ Compiler Overhaul</a>。</p>
+<p>除了 Go 語言實現的 gc 外，Go 官方還維護了一個基於 gcc 實現的 Go 編譯器 <a href="https://go.dev/doc/install/gccgo">gccgo</a>。與 gc 相比，gccgo 編譯速度較慢，但支持更強大的優化，因此由 gccgo 構建的 CPU 密集型(CPU-bound)程序通常會運行得更快。此外 gccgo 比 gc 支持更多的操作系統，如果交叉編譯gc不支持的操作系統，可以考慮使用gccgo。</p>
+<h3 id="源碼安裝"><a class="header" href="#源碼安裝">源碼安裝</a></h3>
+<p>Go 源碼安裝需要系統先有一個<code>bootstrap toolchain</code>，該toolchain可以從下面三種方式獲取：</p>
+<ul>
+<li>從官網下載Go二進制發行包</li>
+<li>使用gccgo工具編譯</li>
+<li>基於Go1.4版本的工具鏈</li>
+</ul>
+<h4 id="從官網下載發行包"><a class="header" href="#從官網下載發行包">從官網下載發行包</a></h4>
+<p>第一種方式是從Go發行包中獲取Go二進制應用，比如要源碼編譯go1.14.13，我們可以去<a href="https://golang.org/dl/">官網</a>下載已經編譯好的go1.13，設置好<code>GOROOT_BOOTSTRAP</code>環境變量，就可以源碼編譯了。</p>
+<pre><code class="language-bash">wget https://golang.org/dl/go1.13.15.linux-amd64.tar.gz
+tar xzvf go1.13.15.linux-amd64.tar.gz
+mv go go1.13.15
+export GOROOT_BOOTSTRAP=/tmp/go1.13.15 # 設置GOROOT_BOOTSTRAP環境變量指向bootstrap toolchain的目錄
+
+cd /tmp
+git clone -b go1.14.13 https://go.googlesource.com/go go1.14.13
+cd go1.14.13/src
+./make.bash
+</code></pre>
+<h4 id="使用gccgo工具編譯"><a class="header" href="#使用gccgo工具編譯">使用gccgo工具編譯</a></h4>
+<p>第二種方式是使用gccgo來編譯：</p>
+<pre><code class="language-bash">sudo apt-get install gccgo-5
+sudo update-alternatives --set go /usr/bin/go-5
+export GOROOT_BOOTSTRAP=/usr
+
+cd /tmp
+git clone -b go1.14.13 https://go.googlesource.com/go go1.14.13
+cd go1.14.13/src
+./make.bash
+</code></pre>
+<h3 id="基於go114版本工具鏈編譯"><a class="header" href="#基於go114版本工具鏈編譯">基於go1.14版本工具鏈編譯</a></h3>
+<p>第三種方式是先編譯出go1.4版本，然後使用go1.4版本去編譯其他版本。</p>
+<pre><code class="language-bash">cd /tmp
+git clone -b go1.4.3 https://go.googlesource.com/go go1.4
+cd go1.4/src
+./all.bash # go1.4版本是c語言實現的編譯器
+export GOROOT_BOOTSTRAP=/tmp/go1.4
+
+git clone -b go1.14.13 https://go.googlesource.com/go go1.14.13
+cd go1.14.13/src
+./all.bash
+</code></pre>
+<h2 id="進一步閱讀"><a class="header" href="#進一步閱讀">進一步閱讀</a></h2>
+<ul>
+<li><a href="https://go.dev/src/cmd/compile/README">Go官方博客：Introduction to the Go compiler</a></li>
+<li><a href="https://medium.com/a-journey-with-go/go-overview-of-the-compiler-4e5a153ca889">Go: Overview of the Compiler</a></li>
+<li><a href="https://getstream.io/blog/how-a-go-program-compiles-down-to-machine-code/">How a Go Program Compiles down to Machine Code</a></li>
+<li><a href="https://draveness.me/golang/docs/part1-prerequisite/ch02-compile/golang-compile-intro/">編譯原理</a></li>
+<li><a href="http://www.en.w3ki.com/compiler_design/compiler_design_phases_of_compiler.html">Compiler appearance - Phases of Compiler</a></li>
+<li><a href="https://github.com/golang/go/tree/master/src/cmd/compile">Introduction to the Go compiler</a></li>
+<li><a href="https://maori.geek.nz/how-go-build-works-750bb2ba6d8e">How “go build” Works</a></li>
+<li><a href="https://docs.google.com/document/d/1P3BLR31VA8cvLJLfMibSuTdwTuF7WWLux71CYD0eeD8/edit">Go 1.3+ Compiler Overhaul</a></li>
+<li><a href="https://golang.org/doc/install/source">Installing Go from source</a></li>
+<li><a href="https://github.com/golang/go/wiki/GcToolchainTricks">GcToolchainTricks</a></li>
+<li><a href="https://weeraman.com/bootstrapping-go-ee5633ce3329">Bootstrapping Go</a></li>
+<li><a href="https://go.dev/blog/gccgo-in-gcc-471">Gccgo in GCC 4.7.1</a></li>
+</ul>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p><a href="https://en.wikipedia.org/wiki/Lexical_analysis">Lexical analysis</a> <a href="#fr-1-1">↩</a></p>
+</li>
+<li id="footnote-2">
+<p><a href="https://en.wikipedia.org/wiki/Parsing">Syntax analysis</a> <a href="#fr-2-1">↩</a></p>
+</li>
+<li id="footnote-3">
+<p>https://go.dev/src/cmd/compile/README <a href="#fr-3-1">↩</a></p>
+</li>
+</ol>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="analysis-tools/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="analysis-tools/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

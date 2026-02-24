@@ -1,0 +1,565 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>原子操作 - atomic - 深入 Go 語言之旅</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">深入 Go 語言之旅</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="原子操作---atomic"><a class="header" href="#原子操作---atomic">原子操作 - atomic</a></h1>
+<p>atomic是Go內置原子操作包。下面是官方說明：</p>
+<blockquote>
+<p>Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms. atomic包提供了用於實現同步機制的底層原子內存原語。</p>
+</blockquote>
+<blockquote>
+<p>These functions require great care to be used correctly. Except for special, low-level applications, synchronization is better done with channels or the facilities of the sync package. Share memory by communicating; don't communicate by sharing memory. 使用這些功能需要非常小心。除了特殊的底層應用程序外，最好使用通道或sync包來進行同步。<strong>通過通信來共享內存；不要通過共享內存來通信</strong>。</p>
+</blockquote>
+<p>atomic包提供的操作可以分爲三類：</p>
+<h3 id="對整數類型t的操作"><a class="header" href="#對整數類型t的操作">對整數類型T的操作</a></h3>
+<p>T類型是<code>int32</code>、<code>int64</code>、<code>uint32</code>、<code>uint64</code>、<code>uintptr</code>其中一種。</p>
+<pre><code class="language-go">func AddT(addr *T, delta T) (new T)
+func CompareAndSwapT(addr *T, old, new T) (swapped bool)
+func LoadT(addr *T) (val T)
+func StoreT(addr *T, val T)
+func SwapT(addr *T, new T) (old T)
+</code></pre>
+<h3 id="對於unsafepointer類型的操作"><a class="header" href="#對於unsafepointer類型的操作">對於<code>unsafe.Pointer</code>類型的操作</a></h3>
+<pre><code class="language-go">func CompareAndSwapPointer(addr *unsafe.Pointer, old, new unsafe.Pointer) (swapped bool)
+func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
+func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
+func SwapPointer(addr *unsafe.Pointer, new unsafe.Pointer) (old unsafe.Pointer)
+</code></pre>
+<h3 id="atomicvalue類型提供loadstore操作"><a class="header" href="#atomicvalue類型提供loadstore操作"><code>atomic.Value</code>類型提供Load/Store操作</a></h3>
+<p>atomic提供了<code>atomic.Value</code>類型，用來原子性加載和存儲類型一致的值（consistently typed value）。<code>atomic.Value</code>提供了對任何類型的原則性操作。</p>
+<pre><code class="language-go">func (v *Value) Load() (x interface{}) // 原子性返回剛剛存儲的值，若沒有值返回nil
+func (v *Value) Store(x interface{}) // 原子性存儲值x，x可以是nil，但需要每次存的值都必須是同一個具體類型。
+</code></pre>
+<h2 id="用法"><a class="header" href="#用法">用法</a></h2>
+<h3 id="用法示例1原子性增加值"><a class="header" href="#用法示例1原子性增加值">用法示例1：原子性增加值</a></h3>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"sync"
+	"sync/atomic"
+)
+
+func main() {
+	var count int32
+	var wg sync.WaitGroup
+
+	for i := 0; i &lt; 10; i++ {
+		wg.Add(1)
+		go func() {
+			atomic.AddInt32(&amp;count, 1) // 原子性增加值
+			wg.Done()
+		}()
+		go func() {
+			fmt.Println(atomic.LoadInt32(&amp;count)) // 原子性加載
+		}()
+	}
+	wg.Wait()
+	fmt.Println("count: ", count)
+}
+</code></pre>
+<h3 id="用法示例2簡易自旋鎖實現"><a class="header" href="#用法示例2簡易自旋鎖實現">用法示例2：簡易自旋鎖實現</a></h3>
+<pre><code class="language-go">package main
+
+import (
+	"sync/atomic"
+)
+
+type spin int64
+
+func (l *spin) lock() bool {
+	for {
+		if atomic.CompareAndSwapInt64((*int64)(l), 0, 1) {
+			return true
+		}
+		continue
+	}
+}
+
+func (l *spin) unlock() bool {
+	for {
+		if atomic.CompareAndSwapInt64((*int64)(l), 1, 0) {
+			return true
+		}
+		continue
+	}
+}
+
+func main() {
+	s := new(spin)
+
+	for i := 0; i &lt; 5; i++ {
+		s.lock()
+		go func(i int) {
+			println(i)
+			s.unlock()
+		}(i)
+	}
+	for {
+
+	}
+}
+</code></pre>
+<h3 id="用法示例3-無符號整數減法操作"><a class="header" href="#用法示例3-無符號整數減法操作">用法示例3： 無符號整數減法操作</a></h3>
+<p>對於Uint32和Uint64類型Add方法第二個參數只能接受相應的無符號整數，<code>atomic</code>包沒有提供減法<code>SubstractT</code>操作：</p>
+<pre><code class="language-go">func AddUint32(addr *uint32, delta uint32) (new uint32)
+func AddUint64(addr *uint64, delta uint64) (new uint64)
+</code></pre>
+<p>對於無符號整數<code>V</code>，我們可以傳遞<code>-V</code>給AddT方法第二個參數就可以實現減法操作。</p>
+<pre><code class="language-go">package main
+
+import (
+	"sync/atomic"
+)
+
+func main() {
+	var i uint64 = 100
+	var j uint64 = 10
+	var k = 5
+	atomic.AddUint64(&amp;i, -j)
+	println(i)
+	atomic.AddUint64(&amp;i, -uint64(k))
+	println(i)
+	// 下面這種操作是不可以的，會發生恐慌：constant -5 overflows uint64
+	// atomic.AddUint64(&amp;i, -uint64(5))
+}
+</code></pre>
+<h2 id="源碼分析"><a class="header" href="#源碼分析">源碼分析</a></h2>
+<p><code>atomic</code>包提供的三類操作的前兩種都是直接通過彙編源碼實現的（<a href="https://github.com/cyub/go-1.14.13/tree/master/src/sync/atomic/asm.s">sync/atomic/asm.s</a>):</p>
+<pre><code class="language-as">#include "textflag.h"
+
+TEXT ·SwapInt32(SB),NOSPLIT,$0
+	JMP	runtime∕internal∕atomic·Xchg(SB)
+
+TEXT ·SwapUint32(SB),NOSPLIT,$0
+	JMP	runtime∕internal∕atomic·Xchg(SB)
+
+...
+
+TEXT ·StoreUintptr(SB),NOSPLIT,$0
+	JMP	runtime∕internal∕atomic·Storeuintptr(SB)
+</code></pre>
+<p>從上面彙編代碼可以看出來atomic操作通過JMP操作跳到<code>runtime/internal/atomic</code>目錄下面的彙編實現。我們把目標轉移到<code>runtime/internal/atomic</code>目錄下面。</p>
+<p>該目錄包含針對不同平臺的atomic彙編實現<code>asm_xxx.s</code>。這裏面我們只關注<code>amd64</code>平臺<code>asm_amd64.s</code>(<a href="https://github.com/cyub/go-1.14.13/tree/master/src/runtime/internal/atomic/asm_amd64.s">runtime/internal/atomic/asm_amd64.s</a>)和<code>atomic_amd64.go</code>(<a href="https://github.com/cyub/go-1.14.13/tree/master/src/runtime/internal/atomic/atomic_amd64.go">runtime/internal/atomic/atomic_amd64.go</a>)。</p>
+<div class="table-wrapper"><table><thead><tr><th>函數</th><th>底層實現</th></tr></thead><tbody>
+<tr><td>SwapInt32 / SwapUint32</td><td>runtime∕internal∕atomic·Xchg</td></tr>
+<tr><td>SwapInt64 / SwapUint64 / SwapUintptr</td><td>runtime∕internal∕atomic·Xchg64</td></tr>
+<tr><td>CompareAndSwapInt32 / CompareAndSwapUint32</td><td>runtime∕internal∕atomic·Cas</td></tr>
+<tr><td>CompareAndSwapUintptr / CompareAndSwapInt64 / CompareAndSwapUint64</td><td>runtime∕internal∕atomic·Cas64</td></tr>
+<tr><td>AddInt32 / AddUint32</td><td>runtime∕internal∕atomic·Xadd</td></tr>
+<tr><td>AddUintptr / AddInt64 / AddUint64</td><td>runtime∕internal∕atomic·Xadd64</td></tr>
+<tr><td>LoadInt32 / LoadUint32</td><td>runtime∕internal∕atomic·Load</td></tr>
+<tr><td>LoadInt64 / LoadUint64 / LoadUint64/ LoadUintptr</td><td>runtime∕internal∕atomic·Load64</td></tr>
+<tr><td>LoadPointer</td><td>runtime∕internal∕atomic·Loadp</td></tr>
+<tr><td>StoreInt32 / StoreUint32</td><td>runtime∕internal∕atomic·Store</td></tr>
+<tr><td>StoreInt64 / StoreUint64 / StoreUintptr</td><td>runtime∕internal∕atomic·Store64</td></tr>
+</tbody></table>
+</div>
+<h3 id="add操作"><a class="header" href="#add操作">Add操作</a></h3>
+<p><code>AddUintptr</code> 、 <code>AddInt64</code> 以及 <code>AddUint64</code>都是由方法<code>runtime∕internal∕atomic·Xadd64</code>實現:</p>
+<pre><code class="language-as">TEXT runtime∕internal∕atomic·Xadd64(SB), NOSPLIT, $0-24
+	MOVQ	ptr+0(FP), BX // 第一個參數保存到BX
+	MOVQ	delta+8(FP), AX // 第二個參數保存到AX
+	MOVQ	AX, CX  // 將第二個參數臨時存到CX寄存器中
+	LOCK			// LOCK指令進行鎖住操作，實現對共享內存獨佔訪問
+	XADDQ	AX, 0(BX) // xaddq指令，實現寄存器AX的值與BX指向的內存存的值互換，
+	// 並將這兩個值的和存在BX指向的內存中，此時AX寄存器存的是第一個參數指向的值
+	ADDQ	CX, AX // 此時AX寄存器的值是Add操作之後的值，和0(BX)值一樣
+	MOVQ	AX, ret+16(FP) # 返回值
+	RET
+</code></pre>
+<p><strong>LOCK</strong>指令是一個指令前綴，其後是<strong>讀-寫</strong>性質的指令，在多處理器環境中，LOCK指令能夠確保在執行LOCK隨後的指令時，處理器擁有對數據的獨佔使用。若對應數據已經在cache line裏，也就不用鎖定總線，僅鎖住緩存行即可，否則需要鎖住總線來保證獨佔性。</p>
+<p><strong>XADDQ</strong>指令用於交換加操作，會將源操作數與目的操作數互換，並將兩者的和保存到源操作數中。</p>
+<p><code>AddInt32</code> 、 <code>AddUint32</code> 都是由方法<code>runtime∕internal∕atomic·Xadd</code>實現，實現邏輯和<code>runtime∕internal∕atomic·Xadd64</code>一樣，只是Xadd中相關數據操作指令後綴是<code>L</code>：</p>
+<pre><code class="language-as">TEXT runtime∕internal∕atomic·Xadd(SB), NOSPLIT, $0-20
+	MOVQ	ptr+0(FP), BX // 注意第一個參數是一個指針類型，是64位，所以還是MOVQ指令
+	MOVL	delta+8(FP), AX // 第二個參數32位的，所以是MOVL指令
+	MOVL	AX, CX
+	LOCK
+	XADDL	AX, 0(BX)
+	ADDL	CX, AX
+	MOVL	AX, ret+16(FP)
+	RET
+</code></pre>
+<h3 id="store操作"><a class="header" href="#store操作">Store操作</a></h3>
+<p><code>StoreInt64</code>、<code>StoreUint64</code>、<code>StoreUintptr</code>三個是<code>runtime∕internal∕atomic·Store64</code>方法實現:</p>
+<pre><code class="language-as">TEXT runtime∕internal∕atomic·Store64(SB), NOSPLIT, $0-16
+	MOVQ	ptr+0(FP), BX // 第一個參數保存到BX
+	MOVQ	val+8(FP), AX // 第二個參數保存到AX
+	XCHGQ	AX, 0(BX) // 將AX寄存器與BX寄存指向內存的值互換，
+	// 那麼第一個參數指向的內存存的值爲第二個參數
+	RET
+</code></pre>
+<p><strong>XCHGQ</strong>指令是交換指令，用於交換源操作數和目的操作數。</p>
+<p><code>StoreInt32</code>、<code>StoreUint32</code>是由<code>runtime∕internal∕atomic·Store</code>方法實現，與<code>runtime∕internal∕atomic·Store64</code>邏輯一樣，這裏不在贅述。</p>
+<h3 id="compareandswap操作"><a class="header" href="#compareandswap操作">CompareAndSwap操作</a></h3>
+<p><code>CompareAndSwapUintptr</code>、<code>CompareAndSwapInt64</code>和<code>CompareAndSwapUint64</code>都是由<code>runtime∕internal∕atomic·Cas64</code>實現：</p>
+<pre><code class="language-as">TEXT runtime∕internal∕atomic·Cas64(SB), NOSPLIT, $0-25
+	MOVQ	ptr+0(FP), BX // 將第一個參數保存到BX
+	MOVQ	old+8(FP), AX // 將第二個參數保存到AX
+	MOVQ	new+16(FP), CX // 將第三個參數保存CX
+	LOCK				 // LOCK指令進行上鎖操作
+	CMPXCHGQ	CX, 0(BX) // BX寄存器指向的內存的值與AX寄存器值進行比較，若相等則把CX寄存器值存儲到BX寄存器指向的內存中
+	SETEQ	ret+24(FP)
+	RET
+</code></pre>
+<p><strong>CMPXCHGQ</strong>指令是比較並交換指令，它的用法是將目的操作數和累加寄存器AX進行比較，若相等，則將源操作數複製到目的操作數中，否則將目的操作複製到累加寄存器中。</p>
+<h3 id="swap操作"><a class="header" href="#swap操作">Swap操作</a></h3>
+<p><code>SwapInt64</code>、<code>SwapUint64</code>、<code>SwapUintptr</code>實現的方法是<code>runtime∕internal∕atomic·Xchg64</code>，<code>SwapInt32</code>和<code>SwapUint32</code>底層實現是<code>runtime∕internal∕atomic·Xchg</code>，這裏面只分析64的操作：</p>
+<pre><code class="language-as">TEXT runtime∕internal∕atomic·Xchg64(SB), NOSPLIT, $0-24
+	MOVQ	ptr+0(FP), BX // 第一個參數保存到BX
+	MOVQ	new+8(FP), AX // 第一個參數保存到AX中
+	XCHGQ	AX, 0(BX) // XCHGQ指令交互AX值到0(BX)中
+	MOVQ	AX, ret+16(FP) // 將舊值返回
+	RET
+</code></pre>
+<h3 id="load操作"><a class="header" href="#load操作">Load操作</a></h3>
+<p><code>LoadInt32</code>、<code>LoadUint32</code>、<code>LoadInt64</code> 、 <code>LoadUint64</code> 、 <code>LoadUint64</code>、 <code>LoadUintptr</code>、<code>LoadPointer</code>實現都是Go實現的：</p>
+<pre><code class="language-go">//go:linkname Load
+//go:linkname Loadp
+//go:linkname Load64
+
+//go:nosplit
+//go:noinline
+func Load(ptr *uint32) uint32 {
+	return *ptr
+}
+
+//go:nosplit
+//go:noinline
+func Loadp(ptr unsafe.Pointer) unsafe.Pointer {
+	return *(*unsafe.Pointer)(ptr)
+}
+
+//go:nosplit
+//go:noinline
+func Load64(ptr *uint64) uint64 {
+	return *ptr
+}
+</code></pre>
+<p>最後我們來分析atomic.Value類型提供Load/Store操作。</p>
+<h3 id="atomicvalue類型的loadstore操作"><a class="header" href="#atomicvalue類型的loadstore操作">atomic.Value類型的Load/Store操作</a></h3>
+<p>atomic.Value類型定義如下：</p>
+<pre><code class="language-go">type Value struct {
+	v interface{}
+}
+
+ // ifaceWords是空接口底層表示
+type ifaceWords struct {
+	typ  unsafe.Pointer
+	data unsafe.Pointer
+}
+</code></pre>
+<p>atomic.Value底層存儲的是空接口類型，空接口底層結構如下：</p>
+<pre><code class="language-go">type eface struct {
+	_type *_type // 空接口持有的類型
+	data  unsafe.Pointer // 指向空接口持有類型變量的指針
+}
+</code></pre>
+<p>atomic.Value內存佈局如下所示：</p>
+<p><img src="../images/202104/atomic_value_mem_layout.png" alt="" /></p>
+<p>從上圖可以看出來atomic.Value內部分爲兩部分，第一個部分是_type類型指針，第二個部分是unsafe.Pointer類型，兩個部分大小都是8字節（64系統下）。我們可以通過以下代碼進行測試：</p>
+<pre><code class="language-go">type Value struct {
+	v interface{}
+}
+
+type ifaceWords struct {
+	typ  unsafe.Pointer
+	data unsafe.Pointer
+}
+
+func main() {
+	func main() {
+	val := Value{v: 123456}
+	t := (*ifaceWords)(unsafe.Pointer(&amp;val))
+	dp := (*t).data            // dp是非安全指針類型變量
+	fmt.Println(*((*int)(dp))) // 輸出123456
+
+	var val2 Value
+	t = (*ifaceWords)(unsafe.Pointer(&amp;val2))
+	fmt.Println(t.typ) // 輸出nil
+}
+</code></pre>
+<p>接下來我們看下Store方法：</p>
+<pre><code class="language-go">func (v *Value) Store(x interface{}) {
+	if x == nil { // atomic.Value類型變量不能是nil
+		panic("sync/atomic: store of nil value into Value")
+	}
+	vp := (*ifaceWords)(unsafe.Pointer(v)) // 將指向atomic.Value類型指針轉換成*ifaceWords類型
+	xp := (*ifaceWords)(unsafe.Pointer(&amp;x)) // xp是*faceWords類型指針，指向傳入參數x
+	for {
+		typ := LoadPointer(&amp;vp.typ) // 原子性返回vp.typ
+		if typ == nil { // 第一次調用Store時候，atomic.Value底層結構體第一部分是nil，
+		// 我們可以從上面測試代碼可以看出來
+			runtime_procPin() // pin process處理，防止M被搶佔
+			if !CompareAndSwapPointer(&amp;vp.typ, nil, unsafe.Pointer(^uintptr(0))) { // 通過cas操作，將atomic.Value的第一部分存儲爲unsafe.Pointer(^uintptr(0))，若沒操作成功，繼續操作
+				runtime_procUnpin() // unpin process處理，釋放對當前M的鎖定
+				continue
+			}
+
+			// vp.data == xp.data
+			// vp.typ == xp.typ
+			StorePointer(&amp;vp.data, xp.data)
+			StorePointer(&amp;vp.typ, xp.typ)
+			runtime_procUnpin()
+			return
+		}
+		if uintptr(typ) == ^uintptr(0) { // 此時說明第一次的Store操作未完成，正在處理中，此時其他的Store等待第一次操作完成
+			continue
+		}
+
+		if typ != xp.typ { // 再次Store操作時進行typ類型校驗，確保每次Store數據對象都必須是同一類型
+			panic("sync/atomic: store of inconsistently typed value into Value")
+		}
+		StorePointer(&amp;vp.data, xp.data) // vp.data == xp.data
+		return
+	}
+}
+</code></pre>
+<p>總結上面Store流程：</p>
+<ol>
+<li>每次調用Store方法時候，會將傳入參數轉換成interface{}類型。當第一次調用Store方法時候，分兩部分操作，分別將傳入參數空接口類型的_typ和data，存儲到Value類型中。</li>
+<li>當再次調用Store類型時候，進行傳入參數空接口類型的_type和Value的_type比較，若不一致直接panic，若一致則將data存儲到Value類型中</li>
+</ol>
+<p>從流程2可以看出來，<strong>每次調用Store方法時傳入參數都必須是同一類型的變量</strong>。當Store完成之後，實現了“鳩佔鵲巢”，atomic.Value底層存儲的實際上是(interface{})x。</p>
+<p>最後我們看看atomic.Value的Load操作：</p>
+<pre><code class="language-go">func (v *Value) Load() (x interface{}) {
+	vp := (*ifaceWords)(unsafe.Pointer(v)) // 將指向v指針轉換成*ifaceWords類型
+	typ := LoadPointer(&amp;vp.typ)
+	if typ == nil || uintptr(typ) == ^uintptr(0) { // typ == nil 說明Store方法未調用過
+	// uintptr(typ) == ^uintptr(0) 說明第一Store方法調用正在進行中
+		return nil
+	}
+	data := LoadPointer(&amp;vp.data)
+	xp := (*ifaceWords)(unsafe.Pointer(&amp;x))
+	xp.typ = typ
+	xp.data = data
+	return
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../concurrency/channel.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../concurrency/sync-map.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../concurrency/channel.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../concurrency/sync-map.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
